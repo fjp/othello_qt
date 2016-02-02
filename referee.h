@@ -1,12 +1,17 @@
 #ifndef REFEREE_H
 #define REFEREE_H
 
-#include <QObject>
+#include <QWidget>
 
-class Referee
+class Referee : public QWidget
 {
+    Q_OBJECT
 public:
-    Referee();
+    explicit Referee(QWidget *parent = 0);
+
+signals:
+
+public slots:
 };
 
 #endif // REFEREE_H

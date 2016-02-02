@@ -1,6 +1,6 @@
 #include "referee.h"
 
-Referee::Referee()
+Referee::Referee(QWidget *parent) : QWidget(parent)
 {
 
 }
