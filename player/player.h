@@ -1,13 +1,13 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <QWidget>
+#include <QObject>
 
-class Player : public QWidget
+class Player : public QObject
 {
     Q_OBJECT
 public:
-    explicit Player(QWidget *parent = 0);
+    explicit Player(QObject *parent = 0);
 
 signals:
 

@@ -46,50 +46,46 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QRectF rect = boundingRect();
     QPen pen;
     QBrush brush;
+    brush.setStyle(Qt::SolidPattern);
 
     switch(m_state)
     {
         case ALLOWED:
-            pen.setColor(Qt::yellow);
+            pen.setColor(Qt::gray);
             brush.setColor(Qt::yellow);
             painter->setPen(pen);
             painter->setBrush(brush);
             painter->drawRect(rect);
             break;
         case BLACK:
-            pen.setColor(Qt::black);
+            pen.setColor(Qt::gray);
             brush.setColor(Qt::black);
             painter->setPen(pen);
             painter->setBrush(brush);
             painter->drawRect(rect);
             break;
         case WHITE:
-            pen.setColor(Qt::white);
+            pen.setColor(Qt::gray);
             brush.setColor(Qt::white);
             painter->setPen(pen);
             painter->setBrush(brush);
             painter->drawRect(rect);
             break;
         case BOARD:
-            pen.setColor(Qt::green);
+            pen.setColor(Qt::gray);
             brush.setColor(Qt::green);
             painter->setPen(pen);
             painter->setBrush(brush);
             painter->drawRect(rect);
             break;
         default:
-            pen.setColor(Qt::green);
+            pen.setColor(Qt::gray);
             brush.setColor(Qt::green);
             painter->setPen(pen);
             painter->setBrush(brush);
             painter->drawRect(rect);
             break;
     }
-
-    //painter->drawPixmap(rect, m_pixBoard->scaled(m_width,m_height), rect);
-    //painter->drawPixmap(rec,m_pixState->scaled(m_width*sizeObject,m_height*sizeObject),rec);
-    //QPointF pixpos((1.0-sizeObject)*0.5*m_width, (1.0-sizeObject)*0.5*m_height);
-    //painter->drawPixmap(pixpos, m_pixState->scaled(m_width*sizeObject,m_height*sizeObject));
 
 }
 

@@ -5,6 +5,7 @@
 #include <QVector>
 #include <QtWidgets>
 #include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
 
 #include "uisquare.h"
 #include "uidisk.h"
@@ -22,6 +23,12 @@ public:
     UIDisk *m_player1;
     UIDisk *m_player2;
 
+signals:
+    void newMouseEvent(QPointF position);
+
+public slots:
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * mouseEvent);
+
 private:
     void initUIGameScene();
     void drawBoard();
@@ -31,6 +38,7 @@ private:
     QVector<UISquare> m_backgroundBlocks;
     int m_numberSquareX;
     int m_numberSquareY;
+    double m_sizeSceneRect;
     double m_squareWidth;
     double m_squareHeight;
 };
