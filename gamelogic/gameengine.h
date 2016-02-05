@@ -8,7 +8,6 @@
 #include <QVector>
 #include <QMessageBox>
 
-#include "gameevent.h"
 #include "board/board.h"
 #include "player/player.h"
 #include "player/computerplayer.h"
@@ -26,28 +25,23 @@ public:
 
     void startGame(int numberOfHumans);
 
-    static QQueue<GameEvent*> eventQueue;
-
     Board *m_board;
     
 public slots:
     void mouseReleased(QPointF point);
-    void mouseReleaseEvent(QMouseEvent * event);
 
 private:
-    /// Game events are appended to the queue and processed by the logic
-    //    QQueue<Event> eventQueue;       //-> in constructor
-
-    //void createPlayers(int human_players);
+    void createPlayers(int human_players);
     //void movePlayers();
-    void eventHandling();
+    void eventHandling(int col, int row);
+    void nextPlayer();
 
     bool checkValidMove(Player *player, Square *square);
     bool getValidMoves(Player* player);
 
     UIGameScene* m_uiGameScene;
 
-    void updateUI(GameEvent *event, UISquare::State state);
+    void updateUI(int col, int row, UISquare::State state);
 
 
     /**
@@ -59,12 +53,14 @@ private:
 
     int m_numberOfHumans;
 
+    Player *m_currentPlayer;
+
     //QVector<QVector<Tile*> > map;
 
     QTimer loopQTimer;
 
-    HumanPlayer* HumanPlayerB;
-    HumanPlayer* HumanPlayerW;
+    HumanPlayer* m_humanPlayerB;
+    HumanPlayer* m_humanPlayerW;
     ComputerPlayer* m_computerPlayerB;
     ComputerPlayer* m_computerPlayerW;
     QList<Player *> players;

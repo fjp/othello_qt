@@ -6,7 +6,7 @@
 class ComputerPlayer : public Player
 {
 public:
-    ComputerPlayer();
+    ComputerPlayer(Player::Color color);
 
 signals:
 

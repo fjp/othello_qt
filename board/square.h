@@ -4,23 +4,26 @@
 #include <QGraphicsItem>
 #include <QPoint>
 
-class Square : public QGraphicsItem
+#include "player/player.h"
+
+class Square
 {
 
 public:
-    Square();
-    int getSize(void);
+    Square(int col, int row);
 
-    enum State {BOARD, BLACK, WHITE, ALLOWED, SUGGESTED};
+    enum State {NONE, BOARD, BLACK, WHITE, ALLOWED, SUGGESTED};
 
-    int m_positionX;
-    int m_positionY;
+    int m_col;
+    int m_row;
 
-
+    State getSquareState(void);
+    void setSquareState(State state);
 
 private:
-    QPoint position;
-    QRectF *square;
+    void initSquare();
+    State m_squareState;
+    Player *m_currentOwner;
 
 
 };

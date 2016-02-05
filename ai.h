@@ -4,6 +4,7 @@
 
 class AI
 {
+
 public:
     AI();
 };

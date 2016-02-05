@@ -15,7 +15,6 @@ TEMPLATE = app
 SOURCES += main/main.cpp\
         main/mainwindow.cpp \
         board/board.cpp \
-        board/disk.cpp \
         board/square.cpp \
         player/player.cpp \
         player/humanplayer.cpp \
@@ -24,13 +23,10 @@ SOURCES += main/main.cpp\
         referee.cpp \
         ui/uisquare.cpp \
         ui/uigamescene.cpp \
-        ui/uidisk.cpp \
-        gamelogic/gameengine.cpp \
-        gamelogic/gameevent.cpp
+        gamelogic/gameengine.cpp
 
 HEADERS  += main/mainwindow.h \
         board/board.h \
-        board/disk.h \
         board/square.h \
         player/player.h \
         player/humanplayer.h \
@@ -39,8 +35,6 @@ HEADERS  += main/mainwindow.h \
         referee.h \
         ui/uisquare.h \
         ui/uigamescene.h \
-        ui/uidisk.h \
-        gamelogic/gameengine.h \
-        gamelogic/gameevent.h
+        gamelogic/gameengine.h
 
 FORMS    += main/mainwindow.ui

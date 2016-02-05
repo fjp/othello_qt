@@ -1,6 +1,9 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+
+#define BOARD_SIZE 8
+
 #include <QObject>
 
 #include "board/square.h"
@@ -11,7 +14,7 @@ class Board : public QObject
 public:
     explicit Board(QObject *parent = 0);
 
-    QVector<QVector<Square* > > boardMatrix;
+
 
     Square getSquare(int x, int y) const;
     //void setSquare(int x, int y, Square *square);
@@ -26,6 +29,7 @@ public:
 
 
 private:
+    QVector<QVector<Square* > > m_boardMatrix;
 
 signals:
 

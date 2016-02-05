@@ -1,6 +1,6 @@
 #include "computerplayer.h"
 
-ComputerPlayer::ComputerPlayer()
+ComputerPlayer::ComputerPlayer(Color color) : Player(0, color)
 {
 
 }

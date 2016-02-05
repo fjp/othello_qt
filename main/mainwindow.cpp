@@ -10,6 +10,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     ui->graphicsViewBoard->setScene(m_uiGameScene);
 
+    // Todo set fixed size
+    //ui->graphicsViewBoard->setFixedSize(m_iWidgetSize - m_iWidgetBorder, m_iWidgetSize - m_iWidgetBorder);
+    ui->graphicsViewBoard->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsViewBoard->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsViewBoard->setRenderHint(QPainter::Antialiasing,true);
+    ui->graphicsViewBoard->setRenderHint(QPainter::SmoothPixmapTransform, true);
 
     connect(ui->pushButton, SIGNAL(released()), this, SLOT(startNewGame()));
 }

@@ -1,6 +1,6 @@
 #include "humanplayer.h"
 
-HumanPlayer::HumanPlayer()
+HumanPlayer::HumanPlayer(Color color) : Player(0, color)
 {
 
 }

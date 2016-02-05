@@ -5,19 +5,20 @@ UIGameScene::UIGameScene(QObject * parent) : QGraphicsScene(parent)
     m_sizeSceneRect = 500;
     m_squareWidth = 50;
     m_squareHeight = 50;
-    m_numberSquareX = 8;
-    m_numberSquareY = 8;
+
+    m_numberColumns = 8;
+    m_numberRows = 8;
     initUIGameScene();
 }
 
-UIGameScene::UIGameScene(QObject *parent, int numberSquareX, int numberSquareY) : QGraphicsScene(parent),
-    m_board(numberSquareX, QVector<UISquare>(numberSquareY)), m_backgroundBlocks((numberSquareX+2)*2 + numberSquareY*2)
+UIGameScene::UIGameScene(QObject *parent, int numberColumns, int numberRows) : QGraphicsScene(parent),
+    m_board(numberRows, QVector<UISquare *>(numberColumns))
 {
     m_sizeSceneRect = 500;
-    m_squareWidth = m_sizeSceneRect / static_cast<double>(numberSquareX);
-    m_squareHeight = m_sizeSceneRect / static_cast<double>(numberSquareY);
-    m_numberSquareX = numberSquareX;
-    m_numberSquareY = numberSquareY;
+    m_squareWidth = m_sizeSceneRect / static_cast<double>(numberColumns);
+    m_squareHeight = m_sizeSceneRect / static_cast<double>(numberRows);
+    m_numberColumns = numberColumns;
+    m_numberRows = numberRows;
     initUIGameScene();
 }
 
@@ -26,25 +27,16 @@ UIGameScene::~UIGameScene()
 
 }
 
-void UIGameScene::setSquareState(int x, int y, UISquare::State state)
+void UIGameScene::setSquareState(int column, int row, UISquare::State state)
 {
-    m_board[x][y].setState(state);
+    qDebug() << "UIGameScene::setSquareState:" << "col,row" << column << "," << row << "State"<< state;
+    m_board[column][row]->setState(state);
 }
 
 void UIGameScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     QPointF point = mouseEvent->scenePos();
-    qDebug() << Q_FUNC_INFO << point;
-
-
-
-    // Todo: move to game logic + extra funciton that converts from point to square
-    int x = point.x() / m_sizeSceneRect * m_numberSquareX;
-    int y = point.y() / m_sizeSceneRect * m_numberSquareY;
-    setSquareState(x,y,UISquare::BLACK);
-    //drawBoard();
-
-    // ------------------
+    qDebug() << "UIGameScene::mouseReleaseEvent" << "Mouse Pointer is at"<< point;
 
     emit newMouseEvent(point);
     QGraphicsScene::mousePressEvent(mouseEvent);
@@ -53,17 +45,23 @@ void UIGameScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 void UIGameScene::initUIGameScene()
 {
     setBackgroundBrush(Qt::gray);
-    setSceneRect(0, 0, m_squareWidth*m_numberSquareX, m_squareHeight*m_numberSquareY);
+    setSceneRect(0, 0, m_squareWidth*m_numberColumns, m_squareHeight*m_numberRows);
     drawBoard();
 }
 
 void UIGameScene::drawBoard()
 {
-    for (int x = 0; x < m_numberSquareX; x++) {
-        for (int y=0; y < m_numberSquareY; y++) {
-            addItem(&m_board[x][y]);
-            m_board[x][y].setPosition(x*m_squareWidth, y*m_squareHeight);
-            m_board[x][y].setSize(m_squareHeight, m_squareWidth);
+    for (int row = 0; row < m_numberRows; row++) {
+        for (int col = 0; col < m_numberColumns; col++) {
+            m_board[col][row] = new UISquare();
+            m_board[col][row]->setState(UISquare::BOARD);
+            this->addItem(m_board[col][row]);
+            m_board[col][row]->setPosition(row*m_squareHeight, col*m_squareWidth);
+            m_board[col][row]->setSize(m_squareHeight, m_squareWidth);
         }
     }
+    m_board[3][3]->setState(UISquare::BLACK);
+    m_board[4][3]->setState(UISquare::WHITE);
+    m_board[3][4]->setState(UISquare::WHITE);
+    m_board[4][4]->setState(UISquare::BLACK);
 }

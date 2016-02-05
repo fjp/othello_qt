@@ -1,11 +1,8 @@
 #include "gameengine.h"
 
-
-QQueue<GameEvent*> GameEngine::eventQueue;
-
 GameEngine::GameEngine(QObject *parent, UIGameScene *uiGameScene) : QObject(parent)
 {
-
+    m_uiGameScene = uiGameScene;
 }
 
 GameEngine::~GameEngine()
@@ -18,7 +15,7 @@ void GameEngine::startGame(int numberOfHumans)
     m_board = new Board();
 
     m_numberOfHumans = numberOfHumans;
-    //createPlayers(numberOfHumans);
+    createPlayers(numberOfHumans);
 
     connect(&loopQTimer, SIGNAL(timeout()), this, SLOT(loop()));
     loopQTimer.start(1000);
@@ -26,44 +23,61 @@ void GameEngine::startGame(int numberOfHumans)
 
 void GameEngine::mouseReleased(QPointF point)
 {
-    qDebug() << "Mouse pointer is at" << point;
+    int col = point.x() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberColumns;
+    int row = point.y() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberRows;
+    qDebug() << "Mouse pointer is at" << point << "Col" << col << "Row" << row;
+
+    eventHandling(col, row);
+
 }
 
-void GameEngine::mouseReleaseEvent(QMouseEvent *event)
+void GameEngine::createPlayers(int human_players)
 {
-    if(event->button() == Qt::LeftButton)
+    m_humanPlayerB = new HumanPlayer(Player::BLACK);
+    m_humanPlayerW = new HumanPlayer(Player::WHITE);
+    m_computerPlayerB = new ComputerPlayer(Player::BLACK);
+    m_computerPlayerW = new ComputerPlayer(Player::WHITE);
+    m_currentPlayer = m_humanPlayerB;
+}
+
+void GameEngine::eventHandling(int col, int row)
+{
+    UISquare::State uiState;
+
+    switch(m_currentPlayer->m_color)
     {
-        QMessageBox *msgBox = new QMessageBox();
-        msgBox->setWindowTitle("Hello");
-        msgBox->setText("You Clicked Left Mouse Button");
-        msgBox->show();
+    case Player::BLACK:
+        uiState = UISquare::BLACK;
+        break;
+
+    case Player::WHITE:
+        uiState = UISquare::WHITE;
+        break;
     }
+    nextPlayer();
+
+    updateUI(col, row, uiState);
 }
 
-void GameEngine::eventHandling()
+void GameEngine::updateUI(int col, int row, UISquare::State state)
 {
-    GameEvent *event;
-    while(!GameEngine::eventQueue.isEmpty())
+    m_uiGameScene->setSquareState(col, row, state);
+}
+
+void GameEngine::nextPlayer()
+{
+    switch(m_currentPlayer->m_color)
     {
-        event = GameEngine::eventQueue.dequeue();
-
-        switch(event->m_gameEvent)
-        {
-        case GameEvent::A1:
-
-            break;
-        case GameEvent::A2:
-
-            break;
-        }
+    case Player::BLACK:
+        m_currentPlayer->m_color = Player::WHITE;
+        break;
+    case Player::WHITE:
+        m_currentPlayer->m_color = Player::BLACK;
+        break;
+    default:
+        m_currentPlayer->m_color = Player::NONE;
     }
-}
-
-void GameEngine::updateUI(GameEvent *event, UISquare::State state)
-{
-    int positionX = event->m_square->m_positionX;
-    int positionY = event->m_square->m_positionY;
-    m_uiGameScene->setSquareState(positionX, positionY, state);
+    qDebug() << "GameEngine::nextPlayer" << m_currentPlayer->m_color;
 }
 
 void GameEngine::counter()

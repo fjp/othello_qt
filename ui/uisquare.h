@@ -9,7 +9,7 @@ class UISquare : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 public:
-    enum State {BOARD, BLACK, WHITE, ALLOWED, SUGGESTED};
+    enum State {NONE, BOARD, BLACK, WHITE, ALLOWED, SUGGESTED};
 
     UISquare();
     UISquare(const double height, const double width);
@@ -23,7 +23,7 @@ public:
 
     void setState(const State state);
     State getState() const;
-    void setPosition(const double positionX, const double positionY);
+    void setPosition(const double boardPositionY, const double boardPositionX);
     void setSize(const double height, const double width);
 
 public slots:
@@ -31,18 +31,21 @@ public slots:
 
 private:
     void initSquare();
+    void setSquareSize();
+    void setDiskSize();
+
     State m_state;
-    State m_stateBuf;
-    double m_positionX;
-    double m_positionY;
-    double m_height;
-    double m_width;
-    QRectF *m_squareState;
-    QRectF *m_allowedSquare;
-    QRectF *m_suggestedSquare;
-    QRectF *m_boardSquare;
-    QRectF *m_blackSquare;
-    QRectF *m_whiteSquare;
+
+    double m_boardPositionX;
+    double m_boardPositionY;
+
+    double m_squareHeight;
+    double m_squareWidth;
+    double m_diskHeight;
+    double m_diskWidth;
+    double m_margin;
+
+    QRectF *m_ellipse;
 };
 
 #endif // UISQUARE_H

@@ -7,7 +7,11 @@ class Player : public QObject
 {
     Q_OBJECT
 public:
-    explicit Player(QObject *parent = 0);
+    enum Color {NONE, BLACK, WHITE} m_color;
+
+    explicit Player(QObject *parent = 0, Color color = NONE);
+
+    void setPlayerColor(Color color);
 
 signals:
 
