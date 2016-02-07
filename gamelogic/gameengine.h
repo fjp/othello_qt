@@ -2,6 +2,7 @@
 #define GAMEENGINE_H
 
 #include <QObject>
+#include <QTextEdit>
 #include <QDebug>
 #include <QTimer>
 #include <QMouseEvent>
@@ -18,7 +19,7 @@ class GameEngine : public QObject
 {
     Q_OBJECT
 public:
-    GameEngine(QObject* parent, UIGameScene* uiGameScene);
+    GameEngine(QObject* parent, UIGameScene* uiGameScene, QTextEdit *eventList, QTextEdit *infoList);
     ~GameEngine();
 
     void registerHumanPlayer(HumanPlayer player);
@@ -31,29 +32,40 @@ public slots:
     void mouseReleased(QPointF point);
 
 private:
-    void createPlayers(int human_players);
+    void createPlayers(int numberOfHumans);
     //void movePlayers();
-    void eventHandling(int col, int row);
-    void nextPlayer();
+    void eventHandling(int x, int y);
+    /**
+     * @brief togglePlayer
+     */
+    void togglePlayer();
+
+    /**
+     * @brief makeMove first checks if the intended move is valid using Board::legalMove(int,int,Player::Color)
+     * If the move is valid, squares are colored accordingly by calling UIGameScene
+     * and the actual m_board is updated.
+     * updated
+     * @param x
+     * @param y
+     */
+    void makeMove(int x, int y);
+
 
     bool checkValidMove(Player *player, Square *square);
     bool getValidMoves(Player* player);
 
     UIGameScene* m_uiGameScene;
+    QTextEdit *m_eventList;
+    QTextEdit *m_infoList;
 
-    void updateUI(int col, int row, UISquare::State state);
-
-
-    /**
-     * @brief execute_move executes the allowed move
-     * @param player which player shall move
-     */
-    void executeHumanMove(HumanPlayer *player, UISquare *uiSquare);
-    void setStateInterfacePlayer(HumanPlayer *player, UISquare *uiSquare);
+    void updateUI(int x, int y, UISquare::State state, Player::Color currentPlayer);
+    void updateInfoText(QString string);
+    void updateEventText(QString string);
 
     int m_numberOfHumans;
 
     Player *m_currentPlayer;
+    Player *m_opponentPlayer;
 
     //QVector<QVector<Tile*> > map;
 

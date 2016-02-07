@@ -37,8 +37,8 @@
      <rect>
       <x>524</x>
       <y>12</y>
-      <width>200</width>
-      <height>500</height>
+      <width>306</width>
+      <height>507</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -53,9 +53,9 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0">
+    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
      <property name="spacing">
-      <number>0</number>
+      <number>12</number>
      </property>
      <property name="sizeConstraint">
       <enum>QLayout::SetNoConstraint</enum>
@@ -67,20 +67,53 @@
       <number>0</number>
      </property>
      <property name="rightMargin">
-      <number>0</number>
+      <number>12</number>
      </property>
      <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="pushButtonNewGame">
        <property name="text">
-        <string>PushButton</string>
+        <string>New Game</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QListView" name="listView"/>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>3</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>Game Info</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QTextEdit" name="textEditInfo"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>7</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>Game Events</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QTextEdit" name="textEditEvents"/>
+        </item>
+       </layout>
+      </widget>
      </item>
     </layout>
    </widget>

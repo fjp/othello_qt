@@ -5,13 +5,20 @@
 #include <QObject>
 #include <QGraphicsItem>
 
+#include "player/player.h"
+
 class UISquare : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 public:
     enum State {NONE, BOARD, BLACK, WHITE, ALLOWED, SUGGESTED};
 
-    UISquare();
+    /**
+     * @brief UISquare main constructor. Position on the board is used for debugging.
+     * @param x
+     * @param y
+     */
+    UISquare(int x, int y, State state = NONE, Player::Color currentOwner = Player::NONE);
     UISquare(const double height, const double width);
 
     // Edit Copy Constructor
@@ -21,9 +28,9 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    void setState(const State state);
+    void setState(const State state, const Player::Color currentOwner = Player::NONE);
     State getState() const;
-    void setPosition(const double boardPositionY, const double boardPositionX);
+    void setPosition(const double boardPositionX, const double boardPositionY);
     void setSize(const double height, const double width);
 
 public slots:
@@ -39,8 +46,14 @@ private:
     double m_boardPositionX;
     double m_boardPositionY;
 
+    int m_x;
+    int m_y;
+
+    Player::Color m_currentOwner;
+
     double m_squareHeight;
     double m_squareWidth;
+
     double m_diskHeight;
     double m_diskWidth;
     double m_margin;

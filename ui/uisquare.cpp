@@ -1,14 +1,11 @@
 #include "uisquare.h"
 
-UISquare::UISquare()
+UISquare::UISquare(int x, int y, State state, Player::Color currentOwner)
 {
-    initSquare();
-}
-
-UISquare::UISquare(const double height, const double width)
-{
-    m_state = BOARD;
-    setSize(height, width);
+    m_x = x;
+    m_y = y;
+    m_state = state;
+    m_currentOwner = currentOwner;
     initSquare();
 }
 
@@ -68,7 +65,6 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             // draw black disk
             brush.setColor(Qt::black);
             painter->setBrush(brush);
-            qDebug() << "BLACK" << m_margin;
             painter->drawEllipse(m_margin, m_margin, m_diskWidth, m_diskHeight);
             break;
 
@@ -82,7 +78,6 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             // draw white disk
             brush.setColor(Qt::white);
             painter->setBrush(brush);
-
             painter->drawEllipse(m_margin, m_margin, m_diskWidth, m_diskHeight);
             break;
 
@@ -103,11 +98,37 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             break;
     }
 
+    QString owner;
+    switch (m_currentOwner)
+    {
+    case Player::BLACK:
+        owner = QString("BLACK");
+        break;
+
+    case Player::WHITE:
+        owner = QString("WHITE");
+        break;
+
+    case Player::NONE:
+        owner = QString("NONE");
+        break;
+
+    default:
+        owner = QString("default");
+        break;
+    }
+
+    QString squarePosition = QString("(%1,%2) %3").arg(QString::number(m_x), QString::number(m_y), owner);
+    pen.setColor(Qt::white);
+    painter->setPen(pen);
+    painter->drawText(5, 10, squarePosition);
+
 }
 
-void UISquare::setState(const UISquare::State state)
+void UISquare::setState(const UISquare::State state, const Player::Color currentOwner)
 {
     m_state = state;
+    m_currentOwner = currentOwner;
     update();
 }
 
@@ -116,7 +137,7 @@ UISquare::State UISquare::getState() const
     return m_state;
 }
 
-void UISquare::setPosition(const double boardPositionY, const double boardPositionX)
+void UISquare::setPosition(const double boardPositionX, const double boardPositionY)
 {
     m_boardPositionX = boardPositionX;
     m_boardPositionY = boardPositionY;

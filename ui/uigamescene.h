@@ -17,7 +17,7 @@ public:
     UIGameScene(QObject * parent, int numberColumns, int numberRows);
     ~UIGameScene();
 
-    void setSquareState(int column, int row, UISquare::State state);
+    void setSquareState(int x, int y, UISquare::State state, Player::Color currentPlayer);
 
     int m_numberColumns;
     int m_numberRows;

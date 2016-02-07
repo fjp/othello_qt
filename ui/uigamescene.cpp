@@ -27,16 +27,16 @@ UIGameScene::~UIGameScene()
 
 }
 
-void UIGameScene::setSquareState(int column, int row, UISquare::State state)
+void UIGameScene::setSquareState(int x, int y, UISquare::State state, Player::Color currentPlayer)
 {
-    qDebug() << "UIGameScene::setSquareState:" << "col,row" << column << "," << row << "State"<< state;
-    m_board[column][row]->setState(state);
+    qDebug() << "UIGameScene::setSquareState:" << "x,y" << x << "," << y << "State"<< state;
+    m_board[x][y]->setState(state, currentPlayer);
 }
 
 void UIGameScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     QPointF point = mouseEvent->scenePos();
-    qDebug() << "UIGameScene::mouseReleaseEvent" << "Mouse Pointer is at"<< point;
+    //qDebug() << "UIGameScene::mouseReleaseEvent" << "Mouse Pointer is at"<< point;
 
     emit newMouseEvent(point);
     QGraphicsScene::mousePressEvent(mouseEvent);
@@ -51,17 +51,16 @@ void UIGameScene::initUIGameScene()
 
 void UIGameScene::drawBoard()
 {
-    for (int row = 0; row < m_numberRows; row++) {
-        for (int col = 0; col < m_numberColumns; col++) {
-            m_board[col][row] = new UISquare();
-            m_board[col][row]->setState(UISquare::BOARD);
-            this->addItem(m_board[col][row]);
-            m_board[col][row]->setPosition(row*m_squareHeight, col*m_squareWidth);
-            m_board[col][row]->setSize(m_squareHeight, m_squareWidth);
+    for (int x = 0; x < m_numberColumns; x++) {
+        for (int y = 0; y < m_numberRows; y++) {
+            m_board[x][y] = new UISquare(x, y, UISquare::BOARD, Player::NONE);
+            this->addItem(m_board[x][y]);
+            m_board[x][y]->setPosition(x*m_squareHeight, y*m_squareWidth);
+            m_board[x][y]->setSize(m_squareHeight, m_squareWidth);
         }
     }
-    m_board[3][3]->setState(UISquare::BLACK);
-    m_board[4][3]->setState(UISquare::WHITE);
-    m_board[3][4]->setState(UISquare::WHITE);
-    m_board[4][4]->setState(UISquare::BLACK);
+    m_board[3][3]->setState(UISquare::BLACK, Player::BLACK);
+    m_board[3][4]->setState(UISquare::WHITE, Player::WHITE);
+    m_board[4][3]->setState(UISquare::WHITE, Player::WHITE);
+    m_board[4][4]->setState(UISquare::BLACK, Player::BLACK);
 }

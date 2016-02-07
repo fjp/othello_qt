@@ -17,7 +17,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->graphicsViewBoard->setRenderHint(QPainter::Antialiasing,true);
     ui->graphicsViewBoard->setRenderHint(QPainter::SmoothPixmapTransform, true);
 
-    connect(ui->pushButton, SIGNAL(released()), this, SLOT(startNewGame()));
+    // set multi row text edit
+    ui->textEditEvents->setWordWrapMode(QTextOption::WordWrap);
+    ui->textEditInfo->setWordWrapMode(QTextOption::WordWrap);
+
+    connect(ui->pushButtonNewGame, SIGNAL(released()), this, SLOT(startNewGame()));
 }
 
 MainWindow::~MainWindow()
@@ -32,7 +36,7 @@ void MainWindow::startNewGame()
     m_uiGameScene = new UIGameScene(this, m_iBoardSize, m_iBoardSize);
 
     // create new GameLogic here to avoid swalloing KeyBoard Input
-    m_gameEngine = new GameEngine(this, m_uiGameScene);
+    m_gameEngine = new GameEngine(this, m_uiGameScene, ui->textEditEvents, ui->textEditInfo);
     connect(m_uiGameScene, SIGNAL(newMouseEvent(QPointF)), m_gameEngine, SLOT(mouseReleased(QPointF)));
     ui->graphicsViewBoard->setScene(m_uiGameScene);
     m_gameEngine->startGame(1);

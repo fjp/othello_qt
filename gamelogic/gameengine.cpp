@@ -1,8 +1,10 @@
 #include "gameengine.h"
 
-GameEngine::GameEngine(QObject *parent, UIGameScene *uiGameScene) : QObject(parent)
+GameEngine::GameEngine(QObject *parent, UIGameScene *uiGameScene, QTextEdit *eventList, QTextEdit *infoList) : QObject(parent)
 {
     m_uiGameScene = uiGameScene;
+    m_eventList = eventList;
+    m_infoList = infoList;
 }
 
 GameEngine::~GameEngine()
@@ -23,61 +25,156 @@ void GameEngine::startGame(int numberOfHumans)
 
 void GameEngine::mouseReleased(QPointF point)
 {
-    int col = point.x() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberColumns;
-    int row = point.y() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberRows;
-    qDebug() << "Mouse pointer is at" << point << "Col" << col << "Row" << row;
+    int x = point.x() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberColumns;
+    int y = point.y() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberRows;
+    qDebug() << "Mouse pointer is at" << point << "x" << x << "y" << y;
 
-    eventHandling(col, row);
+    eventHandling(x, y);
 
 }
 
-void GameEngine::createPlayers(int human_players)
+void GameEngine::createPlayers(int numberOfHumans)
 {
     m_humanPlayerB = new HumanPlayer(Player::BLACK);
     m_humanPlayerW = new HumanPlayer(Player::WHITE);
     m_computerPlayerB = new ComputerPlayer(Player::BLACK);
     m_computerPlayerW = new ComputerPlayer(Player::WHITE);
+
+    // TODO set players correctly according to parameter numberOfHumans
     m_currentPlayer = m_humanPlayerB;
+    m_opponentPlayer = m_humanPlayerW;
 }
 
-void GameEngine::eventHandling(int col, int row)
+void GameEngine::eventHandling(int x, int y)
 {
+    m_eventList->append(QString("(" + QString::number(x) + "," + QString::number(y) + ")"));
     UISquare::State uiState;
 
-    switch(m_currentPlayer->m_color)
+    Player::Color currentPlayer = m_currentPlayer->m_color;
+    switch(currentPlayer)
     {
     case Player::BLACK:
-        uiState = UISquare::BLACK;
+        if (m_board->legalMove(x, y, currentPlayer))
+        {
+            makeMove(x, y);
+            uiState = UISquare::BLACK;
+            updateUI(x, y, uiState, m_currentPlayer->m_color);
+            togglePlayer();
+        }
         break;
 
     case Player::WHITE:
-        uiState = UISquare::WHITE;
+        if (m_board->legalMove(x, y, currentPlayer))
+        {
+            makeMove(x, y);
+            uiState = UISquare::WHITE;
+            updateUI(x, y, uiState, m_currentPlayer->m_color);
+            togglePlayer();
+        }
         break;
     }
-    nextPlayer();
-
-    updateUI(col, row, uiState);
 }
 
-void GameEngine::updateUI(int col, int row, UISquare::State state)
+void GameEngine::updateUI(int x, int y, UISquare::State state, Player::Color currentPlayer)
 {
-    m_uiGameScene->setSquareState(col, row, state);
+    m_uiGameScene->setSquareState(x, y, state, currentPlayer);
 }
 
-void GameEngine::nextPlayer()
+void GameEngine::updateInfoText(QString string)
+{
+    m_infoList->setText(string);
+    switch (m_currentPlayer->m_color)
+    {
+    case Player::BLACK:
+        m_infoList->append(QString("Black to move"));
+        break;
+    case Player::WHITE:
+        m_infoList->append(QString("White to move"));
+        break;
+    case Player::NONE:
+        m_infoList->append(QString("NONE to move?! Debug this"));
+        break;
+    default:
+        m_infoList->append(QString("default case ... Debug this"));
+        break;
+    }
+}
+
+void GameEngine::togglePlayer()
 {
     switch(m_currentPlayer->m_color)
     {
     case Player::BLACK:
         m_currentPlayer->m_color = Player::WHITE;
+        m_opponentPlayer->m_color = Player::BLACK;
         break;
     case Player::WHITE:
         m_currentPlayer->m_color = Player::BLACK;
+        m_opponentPlayer->m_color = Player::WHITE;
         break;
     default:
         m_currentPlayer->m_color = Player::NONE;
+        m_opponentPlayer->m_color = Player::NONE;
     }
+    updateInfoText("togglePlayer");
     qDebug() << "GameEngine::nextPlayer" << m_currentPlayer->m_color;
+}
+
+void GameEngine::makeMove(int x, int y)
+{
+    // TODO update number of moves if valid;
+    // TODO append to a tree?!
+
+    for(int dir = 0; dir < BOARD_SIZE; dir++)
+    {
+        int dx = m_board->m_direction[dir][0];
+        int dy = m_board->m_direction[dir][1];
+        int tx = x + 2*dx;
+        int ty = y + 2*dy;
+        // need to be at least 2 grids away from the edge
+        if (!m_board->onBoard(tx, ty))
+        {
+            continue;
+        }
+        // oppenent piece must be adjacent in the current direction
+        if (m_board->getSquare(x+dx, y+dy)->getOwner() != m_opponentPlayer->m_color)
+        {
+            continue;
+        }
+        // as long as we stay on the board going in the current direction, we search for the surrounding disk
+        while(m_board->onBoard(tx, ty) && m_board->getSquare(tx, ty)->getOwner() == m_opponentPlayer->m_color)
+        {
+            tx += dx;
+            ty += dy;
+        }
+        // if we are still on the board and we found the surrounding disk in the current direction
+        // the move is legal.
+
+        // go back and flip the pieces if move is legal
+        if(m_board->onBoard(tx, ty) && m_board->getSquare(tx, ty)->getOwner() == m_currentPlayer->m_color)
+        {
+            tx -= dx;
+            ty -= dy;
+
+            while(m_board->getSquare(tx, ty)->getOwner() == m_opponentPlayer->m_color)
+            {
+                qDebug() << "Flipping" << tx << "," << ty;
+                m_board->getSquare(tx, ty)->setOwner(m_currentPlayer->m_color);
+                if (m_currentPlayer->m_color == Player::BLACK)
+                {
+                    updateUI(tx, ty, UISquare::BLACK, Player::BLACK);
+                }
+                else
+                {
+                    updateUI(tx, ty, UISquare::WHITE, Player::WHITE);
+                }
+                tx -= dx;
+                ty -= dy;
+            }
+            // set color of placed disk to current player
+            m_board->getSquare(x, y)->setOwner(m_currentPlayer->m_color);
+        }
+    }
 }
 
 void GameEngine::counter()
