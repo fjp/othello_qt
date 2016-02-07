@@ -27,6 +27,8 @@ void GameEngine::startGame(int numberOfHumans)
 
     updateInfoText("Current Player");
 
+    showLegalMoves();
+
     // TODO counter
     loopQTimer.start(1000);
 }
@@ -145,16 +147,21 @@ void GameEngine::togglePlayer()
     }
     updateInfoText("Current Player");
     qDebug() << "GameEngine::nextPlayer" << m_currentPlayer->m_color;
+
+    showLegalMoves();
 }
 
 void GameEngine::showLegalMoves()
 {
-    QVector<Square *> legalMoves;
+    QVector<Square* > *legalMoves = new QVector<Square* >;
+    //int * pointer = new int();
 
     // check if there are legal moves available before actually trying to redraw some.
-    if (m_board->getLegalMoves(legalMoves) == true)
+
+    bool legalMovesAvailable = m_board->getLegalMoves(legalMoves);
+    if (legalMovesAvailable == true)
     {
-        foreach (Square *square, legalMoves) {
+        foreach (Square *square, *legalMoves) {
             m_uiGameScene->setSquareState(square->m_x, square->m_y, UISquare::ALLOWED, m_currentPlayer->m_color);
         }
     }

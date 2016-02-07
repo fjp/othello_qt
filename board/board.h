@@ -37,7 +37,7 @@ public:
      * @param legalMoves
      * @return
      */
-    bool getLegalMoves(QVector<Square* > legalMoves);
+    bool getLegalMoves(QVector<Square *> *legalMoves);
     void makeMove(int x, int y);
     //bool findLegalMoves(bool *legalMoves);
 

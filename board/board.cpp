@@ -98,7 +98,7 @@ bool Board::legalMove(int x, int y)
 
 }
 
-bool Board::getLegalMoves(QVector<Square* > legalMoves)
+bool Board::getLegalMoves(QVector<Square* > *legalMoves)
 {
     Square *allowedSquare = NULL;
     bool legalMovesAvailable = false;
@@ -114,7 +114,7 @@ bool Board::getLegalMoves(QVector<Square* > legalMoves)
                 allowedSquare->setSquareState(Square::ALLOWED);
 
                 // append newly found legal move to legalMoves vector.
-                legalMoves.append(allowedSquare);
+                legalMoves->append(allowedSquare);
                 legalMovesAvailable = true;
             }
         }
