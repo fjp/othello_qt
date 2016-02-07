@@ -14,10 +14,12 @@ GameEngine::~GameEngine()
 
 void GameEngine::startGame(int numberOfHumans)
 {
-    m_board = new Board();
-
     m_numberOfHumans = numberOfHumans;
     createPlayers(numberOfHumans);
+
+    m_board = new Board(m_currentPlayer);
+
+
 
     connect(m_board, SIGNAL(signalBoardChanged(int,int,Player::Color)), this, SLOT(updateUI(int,int,Player::Color)));
 
@@ -59,20 +61,20 @@ void GameEngine::eventHandling(int x, int y)
     switch(currentPlayer)
     {
     case Player::BLACK:
-        if (m_board->legalMove(x, y, currentPlayer))
+        if (m_board->legalMove(x, y))
         {
             //makeMove(x, y);
-            m_board->makeMove(x, y, Player::BLACK);
+            m_board->makeMove(x, y);
             updateUI(x, y, Player::BLACK);
             togglePlayer();
         }
         break;
 
     case Player::WHITE:
-        if (m_board->legalMove(x, y, currentPlayer))
+        if (m_board->legalMove(x, y))
         {
             //makeMove(x, y);
-            m_board->makeMove(x, y, Player::WHITE);
+            m_board->makeMove(x, y);
             updateUI(x, y, Player::WHITE);
             togglePlayer();
         }
@@ -143,6 +145,19 @@ void GameEngine::togglePlayer()
     }
     updateInfoText("Current Player");
     qDebug() << "GameEngine::nextPlayer" << m_currentPlayer->m_color;
+}
+
+void GameEngine::showLegalMoves()
+{
+    QVector<Square *> legalMoves;
+
+    // check if there are legal moves available before actually trying to redraw some.
+    if (m_board->getLegalMoves(legalMoves) == true)
+    {
+        foreach (Square *square, legalMoves) {
+            m_uiGameScene->setSquareState(square->m_x, square->m_y, UISquare::ALLOWED, m_currentPlayer->m_color);
+        }
+    }
 }
 
 //void GameEngine::makeMove(int x, int y)

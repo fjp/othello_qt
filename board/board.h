@@ -14,12 +14,13 @@ class Board : public QObject
 {
     Q_OBJECT
 public:
-    explicit Board(QObject *parent = 0);
+    explicit Board(Player *currentPlayer, QObject *parent = 0);
 
     const int m_direction[8][2] = {{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}};
 
 
     Square *getSquare(int x, int y);
+    Square::State getSquareState(int x, int y);
     //void setSquare(int x, int y, Square *square);
 
     void newBoard();
@@ -28,8 +29,16 @@ public:
     void setPlayers();
     void setTestSquare();
 
-    bool legalMove(int x, int y, Player::Color currentPlayer);
-    void makeMove(int x, int y, Player::Color currentPlayer);
+    bool legalMove(int x, int y);
+
+    /**
+     * @brief getLegalMoves fill the provided QVector legalMoves with Squares
+     * that are allowed to place disks on for the current player.
+     * @param legalMoves
+     * @return
+     */
+    bool getLegalMoves(QVector<Square* > legalMoves);
+    void makeMove(int x, int y);
     //bool findLegalMoves(bool *legalMoves);
 
     /**
@@ -45,7 +54,7 @@ public:
      * @param currentPlayer
      * @return
      */
-    Player::Color getOtherPlayer(Player::Color currentPlayer);
+    Player::Color getOtherPlayer(Player *currentPlayer);
 
 
     bool checkValidMove(int x, int y);
@@ -53,6 +62,7 @@ public:
 
 private:
     QVector<QVector<Square* > > m_boardMatrix;
+    Player *m_currentPlayer;
 
 
 signals:

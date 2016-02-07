@@ -51,6 +51,13 @@ private:
      */
     //void makeMove(int x, int y);
 
+    /**
+     * @brief showLegalMoves is used when players toggle to update UI to display allowed moves.
+     */
+    void showLegalMoves(void);
+
+
+
 
     bool checkValidMove(Player *player, Square *square);
     bool getValidMoves(Player* player);
