@@ -30,6 +30,7 @@ public:
     
 public slots:
     void mouseReleased(QPointF point);
+    void updateUI(int x, int y, Player::Color currentPlayer);
 
 private:
     void createPlayers(int numberOfHumans);
@@ -48,7 +49,7 @@ private:
      * @param x
      * @param y
      */
-    void makeMove(int x, int y);
+    //void makeMove(int x, int y);
 
 
     bool checkValidMove(Player *player, Square *square);
@@ -58,7 +59,7 @@ private:
     QTextEdit *m_eventList;
     QTextEdit *m_infoList;
 
-    void updateUI(int x, int y, UISquare::State state, Player::Color currentPlayer);
+
     void updateInfoText(QString string);
     void updateEventText(QString string);
 

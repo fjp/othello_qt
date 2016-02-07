@@ -92,6 +92,67 @@ bool Board::legalMove(int x, int y, Player::Color currentPlayer)
 
 }
 
+void Board::makeMove(int x, int y, Player::Color currentPlayer)
+{
+    // TODO update number of moves if valid;
+    // TODO append to a tree?!
+
+    for(int dir = 0; dir < BOARD_SIZE; dir++)
+    {
+        int dx = m_direction[dir][0];
+        int dy = m_direction[dir][1];
+        int tx = x + 2*dx;
+        int ty = y + 2*dy;
+        // need to be at least 2 grids away from the edge
+        if (!onBoard(tx, ty))
+        {
+            continue;
+        }
+        // oppenent piece must be adjacent in the current direction
+        if (m_boardMatrix[x+dx][y+dy]->getOwner() != getOtherPlayer(currentPlayer))
+        {
+            continue;
+        }
+        // as long as we stay on the board going in the current direction, we search for the surrounding disk
+        while(onBoard(tx, ty) && m_boardMatrix[tx][ty]->getOwner() == getOtherPlayer(currentPlayer))
+        {
+            tx += dx;
+            ty += dy;
+        }
+        // if we are still on the board and we found the surrounding disk in the current direction
+        // the move is legal.
+
+        // go back and flip the pieces if move is legal
+        if(onBoard(tx, ty) && m_boardMatrix[tx][ty]->getOwner() == currentPlayer)
+        {
+            tx -= dx;
+            ty -= dy;
+
+            while(m_boardMatrix[tx][ty]->getOwner() == getOtherPlayer(currentPlayer))
+            {
+                qDebug() << "Flipping" << tx << "," << ty;
+                m_boardMatrix[tx][ty]->setOwner(currentPlayer);
+                if (currentPlayer == Player::BLACK)
+                {
+                    //updateUI(tx, ty, UISquare::BLACK, Player::BLACK);
+                    emit signalBoardChanged(tx, ty, Player::BLACK);
+                }
+                else
+                {
+                    //updateUI(tx, ty, UISquare::WHITE, Player::WHITE);
+                    emit signalBoardChanged(tx, ty, Player::WHITE);
+                }
+
+                tx -= dx;
+                ty -= dy;
+            }
+            // set color of placed disk to current player
+            m_boardMatrix[x][y]->setOwner(currentPlayer);
+        }
+    }
+
+}
+
 bool Board::onBoard(int x, int y)
 {
     if (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE)

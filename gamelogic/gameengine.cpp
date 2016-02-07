@@ -19,7 +19,13 @@ void GameEngine::startGame(int numberOfHumans)
     m_numberOfHumans = numberOfHumans;
     createPlayers(numberOfHumans);
 
+    connect(m_board, SIGNAL(signalBoardChanged(int,int,Player::Color)), this, SLOT(updateUI(int,int,Player::Color)));
+
     connect(&loopQTimer, SIGNAL(timeout()), this, SLOT(loop()));
+
+    updateInfoText("Current Player");
+
+    // TODO counter
     loopQTimer.start(1000);
 }
 
@@ -48,7 +54,6 @@ void GameEngine::createPlayers(int numberOfHumans)
 void GameEngine::eventHandling(int x, int y)
 {
     m_eventList->append(QString("(" + QString::number(x) + "," + QString::number(y) + ")"));
-    UISquare::State uiState;
 
     Player::Color currentPlayer = m_currentPlayer->m_color;
     switch(currentPlayer)
@@ -56,9 +61,9 @@ void GameEngine::eventHandling(int x, int y)
     case Player::BLACK:
         if (m_board->legalMove(x, y, currentPlayer))
         {
-            makeMove(x, y);
-            uiState = UISquare::BLACK;
-            updateUI(x, y, uiState, m_currentPlayer->m_color);
+            //makeMove(x, y);
+            m_board->makeMove(x, y, Player::BLACK);
+            updateUI(x, y, Player::BLACK);
             togglePlayer();
         }
         break;
@@ -66,18 +71,38 @@ void GameEngine::eventHandling(int x, int y)
     case Player::WHITE:
         if (m_board->legalMove(x, y, currentPlayer))
         {
-            makeMove(x, y);
-            uiState = UISquare::WHITE;
-            updateUI(x, y, uiState, m_currentPlayer->m_color);
+            //makeMove(x, y);
+            m_board->makeMove(x, y, Player::WHITE);
+            updateUI(x, y, Player::WHITE);
             togglePlayer();
         }
+        break;
+
+    case Player::NONE:
+        qDebug() << "GameEngine::eventHandling" << "Player::NONE?! Debug this";
+        break;
+
+    default:
+        qDebug() << "GameEngine::eventHandling" << "default case. Debug this";
         break;
     }
 }
 
-void GameEngine::updateUI(int x, int y, UISquare::State state, Player::Color currentPlayer)
+void GameEngine::updateUI(int x, int y, Player::Color currentPlayer)
 {
-    m_uiGameScene->setSquareState(x, y, state, currentPlayer);
+    switch (currentPlayer) {
+    case Player::BLACK:
+        m_uiGameScene->setSquareState(x, y, UISquare::BLACK, currentPlayer);
+        break;
+    case Player::WHITE:
+        m_uiGameScene->setSquareState(x, y, UISquare::WHITE, currentPlayer);
+        break;
+    case Player::NONE:
+        m_uiGameScene->setSquareState(x, y, UISquare::BOARD, currentPlayer);
+        break;
+    default:
+        break;
+    }
 }
 
 void GameEngine::updateInfoText(QString string)
@@ -116,66 +141,66 @@ void GameEngine::togglePlayer()
         m_currentPlayer->m_color = Player::NONE;
         m_opponentPlayer->m_color = Player::NONE;
     }
-    updateInfoText("togglePlayer");
+    updateInfoText("Current Player");
     qDebug() << "GameEngine::nextPlayer" << m_currentPlayer->m_color;
 }
 
-void GameEngine::makeMove(int x, int y)
-{
-    // TODO update number of moves if valid;
-    // TODO append to a tree?!
+//void GameEngine::makeMove(int x, int y)
+//{
+//    // TODO update number of moves if valid;
+//    // TODO append to a tree?!
 
-    for(int dir = 0; dir < BOARD_SIZE; dir++)
-    {
-        int dx = m_board->m_direction[dir][0];
-        int dy = m_board->m_direction[dir][1];
-        int tx = x + 2*dx;
-        int ty = y + 2*dy;
-        // need to be at least 2 grids away from the edge
-        if (!m_board->onBoard(tx, ty))
-        {
-            continue;
-        }
-        // oppenent piece must be adjacent in the current direction
-        if (m_board->getSquare(x+dx, y+dy)->getOwner() != m_opponentPlayer->m_color)
-        {
-            continue;
-        }
-        // as long as we stay on the board going in the current direction, we search for the surrounding disk
-        while(m_board->onBoard(tx, ty) && m_board->getSquare(tx, ty)->getOwner() == m_opponentPlayer->m_color)
-        {
-            tx += dx;
-            ty += dy;
-        }
-        // if we are still on the board and we found the surrounding disk in the current direction
-        // the move is legal.
+//    for(int dir = 0; dir < BOARD_SIZE; dir++)
+//    {
+//        int dx = m_board->m_direction[dir][0];
+//        int dy = m_board->m_direction[dir][1];
+//        int tx = x + 2*dx;
+//        int ty = y + 2*dy;
+//        // need to be at least 2 grids away from the edge
+//        if (!m_board->onBoard(tx, ty))
+//        {
+//            continue;
+//        }
+//        // oppenent piece must be adjacent in the current direction
+//        if (m_board->getSquare(x+dx, y+dy)->getOwner() != m_opponentPlayer->m_color)
+//        {
+//            continue;
+//        }
+//        // as long as we stay on the board going in the current direction, we search for the surrounding disk
+//        while(m_board->onBoard(tx, ty) && m_board->getSquare(tx, ty)->getOwner() == m_opponentPlayer->m_color)
+//        {
+//            tx += dx;
+//            ty += dy;
+//        }
+//        // if we are still on the board and we found the surrounding disk in the current direction
+//        // the move is legal.
 
-        // go back and flip the pieces if move is legal
-        if(m_board->onBoard(tx, ty) && m_board->getSquare(tx, ty)->getOwner() == m_currentPlayer->m_color)
-        {
-            tx -= dx;
-            ty -= dy;
+//        // go back and flip the pieces if move is legal
+//        if(m_board->onBoard(tx, ty) && m_board->getSquare(tx, ty)->getOwner() == m_currentPlayer->m_color)
+//        {
+//            tx -= dx;
+//            ty -= dy;
 
-            while(m_board->getSquare(tx, ty)->getOwner() == m_opponentPlayer->m_color)
-            {
-                qDebug() << "Flipping" << tx << "," << ty;
-                m_board->getSquare(tx, ty)->setOwner(m_currentPlayer->m_color);
-                if (m_currentPlayer->m_color == Player::BLACK)
-                {
-                    updateUI(tx, ty, UISquare::BLACK, Player::BLACK);
-                }
-                else
-                {
-                    updateUI(tx, ty, UISquare::WHITE, Player::WHITE);
-                }
-                tx -= dx;
-                ty -= dy;
-            }
-            // set color of placed disk to current player
-            m_board->getSquare(x, y)->setOwner(m_currentPlayer->m_color);
-        }
-    }
-}
+//            while(m_board->getSquare(tx, ty)->getOwner() == m_opponentPlayer->m_color)
+//            {
+//                qDebug() << "Flipping" << tx << "," << ty;
+//                m_board->getSquare(tx, ty)->setOwner(m_currentPlayer->m_color);
+//                if (m_currentPlayer->m_color == Player::BLACK)
+//                {
+//                    updateUI(tx, ty, UISquare::BLACK, Player::BLACK);
+//                }
+//                else
+//                {
+//                    updateUI(tx, ty, UISquare::WHITE, Player::WHITE);
+//                }
+//                tx -= dx;
+//                ty -= dy;
+//            }
+//            // set color of placed disk to current player
+//            m_board->getSquare(x, y)->setOwner(m_currentPlayer->m_color);
+//        }
+//    }
+//}
 
 void GameEngine::counter()
 {

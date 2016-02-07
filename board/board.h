@@ -29,6 +29,7 @@ public:
     void setTestSquare();
 
     bool legalMove(int x, int y, Player::Color currentPlayer);
+    void makeMove(int x, int y, Player::Color currentPlayer);
     //bool findLegalMoves(bool *legalMoves);
 
     /**
@@ -55,6 +56,7 @@ private:
 
 
 signals:
+    void signalBoardChanged(int x, int y, Player::Color color);
 
 public slots:
 };
