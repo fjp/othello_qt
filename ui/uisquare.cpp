@@ -50,10 +50,17 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     {
         case ALLOWED:
             pen.setColor(Qt::black);
-            brush.setColor(Qt::yellow);
+            brush.setColor(Qt::darkGreen);
             painter->setPen(pen);
             painter->setBrush(brush);
             painter->drawRect(rect);
+
+            // draw gray disk
+            pen.setColor(Qt::gray);
+            brush.setColor(Qt::gray);
+            painter->setPen(pen);
+            painter->setBrush(brush);
+            painter->drawEllipse(m_margin*4, m_margin*4, m_diskWidth/2, m_diskHeight/2);
             break;
         case BLACK:
             pen.setColor(Qt::black);
@@ -76,8 +83,10 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             painter->drawRect(rect);
 
             // draw white disk
+            pen.setColor(Qt::white);
             brush.setColor(Qt::white);
             painter->setBrush(brush);
+            painter->setPen(pen);
             painter->drawEllipse(m_margin, m_margin, m_diskWidth, m_diskHeight);
             break;
 
@@ -125,10 +134,28 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 }
 
-void UISquare::setState(const UISquare::State state, const Player::Color currentOwner)
+void UISquare::setState(const UISquare::State state)
 {
     m_state = state;
-    m_currentOwner = currentOwner;
+
+    switch (m_state) {
+    case UISquare::ALLOWED:
+        m_currentOwner = Player::NONE;
+        break;
+    case UISquare::BLACK:
+        m_currentOwner = Player::BLACK;
+        break;
+    case UISquare::WHITE:
+        m_currentOwner = Player::WHITE;
+        break;
+    case UISquare::NONE:
+        m_currentOwner = Player::NONE;
+        break;
+    default:
+        break;
+    }
+
+    // commit redraw of changed square -> this updates the GraphicsScene UIGameScene.
     update();
 }
 

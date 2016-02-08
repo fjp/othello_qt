@@ -27,10 +27,10 @@ UIGameScene::~UIGameScene()
 
 }
 
-void UIGameScene::setSquareState(int x, int y, UISquare::State state, Player::Color currentPlayer)
+void UIGameScene::setSquareState(int x, int y, UISquare::State state)
 {
     qDebug() << "UIGameScene::setSquareState:" << "x,y" << x << "," << y << "State"<< state;
-    m_board[x][y]->setState(state, currentPlayer);
+    m_board[x][y]->setState(state);
 }
 
 void UIGameScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -59,8 +59,8 @@ void UIGameScene::drawBoard()
             m_board[x][y]->setSize(m_squareHeight, m_squareWidth);
         }
     }
-    m_board[3][3]->setState(UISquare::BLACK, Player::BLACK);
-    m_board[3][4]->setState(UISquare::WHITE, Player::WHITE);
-    m_board[4][3]->setState(UISquare::WHITE, Player::WHITE);
-    m_board[4][4]->setState(UISquare::BLACK, Player::BLACK);
+    m_board[3][3]->setState(UISquare::BLACK);
+    m_board[3][4]->setState(UISquare::WHITE);
+    m_board[4][3]->setState(UISquare::WHITE);
+    m_board[4][4]->setState(UISquare::BLACK);
 }

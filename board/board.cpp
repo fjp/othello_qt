@@ -34,9 +34,26 @@ void Board::newBoard()
     m_boardMatrix[4][4]->setSquareState(Square::BLACK);
 }
 
-void Board::setTestSquare()
+void Board::countDisks(void)
 {
-
+    Player::Color currentOwner;
+    for (int x = 0; x < BOARD_SIZE; x++)
+    {
+        for (int y = 0; y < BOARD_SIZE; y++)
+        {
+            currentOwner = m_boardMatrix[x][y]->getOwner();
+            if (currentOwner == Player::BLACK)
+            {
+                m_numberOfBlackDisks++;
+                m_numberOfDisks++;
+            }
+            else if (currentOwner == Player::WHITE)
+            {
+                m_numberOfWhiteDisks++;
+                m_numberOfDisks++;
+            }
+        }
+    }
 }
 
 bool Board::legalMove(int x, int y)

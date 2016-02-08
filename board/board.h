@@ -16,19 +16,33 @@ class Board : public QObject
 public:
     explicit Board(Player *currentPlayer, QObject *parent = 0);
 
+    // TODO move intitialization to constructor
     const int m_direction[8][2] = {{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}};
-
 
     Square *getSquare(int x, int y);
     Square::State getSquareState(int x, int y);
-    //void setSquare(int x, int y, Square *square);
 
     void newBoard();
-    void setSuggestion();
-    void setAllowed();
-    void setPlayers();
-    void setTestSquare();
 
+    void setPlayers();
+
+    /**
+     * @brief countDisks count number of black, white and total disks
+     * and store it in the corresponding member variables.
+     */
+    void countDisks(void);
+
+    int m_numberOfBlackDisks;
+    int m_numberOfWhiteDisks;
+    int m_numberOfDisks;
+
+
+    /**
+     * @brief legalMove check if the move at position (x,y) is legal.
+     * @param x
+     * @param y
+     * @return
+     */
     bool legalMove(int x, int y);
 
     /**
@@ -38,6 +52,12 @@ public:
      * @return
      */
     bool getLegalMoves(QVector<Square *> *legalMoves);
+
+    /**
+     * @brief makeMove actually make a move that is legal.
+     * @param x
+     * @param y
+     */
     void makeMove(int x, int y);
     //bool findLegalMoves(bool *legalMoves);
 
@@ -55,9 +75,6 @@ public:
      * @return
      */
     Player::Color getOtherPlayer(Player *currentPlayer);
-
-
-    bool checkValidMove(int x, int y);
 
 
 private:

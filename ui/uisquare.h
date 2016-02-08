@@ -28,7 +28,13 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    void setState(const State state, const Player::Color currentOwner = Player::NONE);
+    /**
+     * @brief setState update the state of the square according to passed
+     * enum State {NONE, BOARD, BLACK, WHITE, ALLOWED, SUGGESTED}
+     *
+     * @param state
+     */
+    void setState(const State state);
     State getState() const;
     void setPosition(const double boardPositionX, const double boardPositionY);
     void setSize(const double height, const double width);

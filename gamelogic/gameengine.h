@@ -33,8 +33,24 @@ public slots:
     void updateUI(int x, int y, Player::Color currentPlayer);
 
 private:
+    /**
+     * @brief gameOver test if game is over.
+     */
+    bool gameOver(void);
+
+    /**
+     * @brief getGameStats summarize game statistics
+     */
+    QString getGameStats(void);
+
+
+    /**
+     * @brief makePass used if there are no legal moves left for the current player
+     */
+    void makePass();
+
     void createPlayers(int numberOfHumans);
-    //void movePlayers();
+
     void eventHandling(int x, int y);
     /**
      * @brief togglePlayer
@@ -49,46 +65,92 @@ private:
      * @param x
      * @param y
      */
-    //void makeMove(int x, int y);
+    //void makeMove(int x, int y); TODO moved to board -> copy comment.
 
     /**
      * @brief showLegalMoves is used when players toggle to update UI to display allowed moves.
      */
     void showLegalMoves(void);
 
+    QVector<Square* > *m_legalMoves;
 
-
-
-    bool checkValidMove(Player *player, Square *square);
-    bool getValidMoves(Player* player);
 
     UIGameScene* m_uiGameScene;
     QTextEdit *m_eventList;
     QTextEdit *m_infoList;
 
 
+    /**
+     * @brief revertAllowedUISquares revert allowed squares to Board state that were NOT picked
+     * by current player
+     * @param x picked square by current player (x position)
+     * @param y picked square by current player (y position)
+     */
+    void revertAllowedUISquares(int x, int y);
+
+    /**
+     * @brief updateInfoText
+     * @param string
+     */
     void updateInfoText(QString string);
     void updateEventText(QString string);
 
     int m_numberOfHumans;
 
+    /**
+     * @brief m_gameEvents sequence of moves including passes.
+     */
+    QList<int> m_gameEvents;
+
+    /**
+     * @brief numberOfActualMoves number of actual moves without passes.
+     */
+    int m_numberOfActualMoves;
+
+    /**
+     * @brief numberOfTotalMoves number of total moves including passes.
+     */
+    int m_numberOfTotalMoves;
+
+    /**
+     * @brief m_elapsedTime used to display the time needed to make a move.
+     */
+    double m_elapsedTime;
+
+    /**
+     * @brief getThinkingTime returns the time in seconds needed for a move.
+     * @return
+     */
+    double getThinkingTime();
+
     Player *m_currentPlayer;
     Player *m_opponentPlayer;
 
-    //QVector<QVector<Tile*> > map;
+    /**
+     * @brief m_thinkingTime displays the time needed to make a move.
+     */
+    QElapsedTimer m_thinkingTime;
 
-    QTimer loopQTimer;
-
+    /**
+     * @brief m_humanPlayerB is used to store black human player.
+     */
     HumanPlayer* m_humanPlayerB;
+
+    /**
+     * @brief m_humanPlayerW is used to store white human player.
+     */
     HumanPlayer* m_humanPlayerW;
+
+    /**
+     * @brief m_computerPlayerB
+     */
     ComputerPlayer* m_computerPlayerB;
     ComputerPlayer* m_computerPlayerW;
     QList<Player *> players;
 
-    QList<Square *> possibleSquares;
-
 
 private slots:
+    // TODO needed?
     void counter();
 };
 

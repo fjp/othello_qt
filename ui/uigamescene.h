@@ -14,10 +14,11 @@ class UIGameScene : public QGraphicsScene
     Q_OBJECT
 public:
     UIGameScene(QObject * parent);
+    // TODO: we need only one size variable -> int boardSize
     UIGameScene(QObject * parent, int numberColumns, int numberRows);
     ~UIGameScene();
 
-    void setSquareState(int x, int y, UISquare::State state, Player::Color currentPlayer);
+    void setSquareState(int x, int y, UISquare::State state);
 
     int m_numberColumns;
     int m_numberRows;

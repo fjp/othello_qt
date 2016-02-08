@@ -2,15 +2,14 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
-    ui(new Ui::MainWindow), m_iBoardSize(8)
+    ui(new Ui::MainWindow), m_iBoardSize(8) // TODO where is BoardSize actually used?
 {
     ui->setupUi(this);
 
-    //qApp->installEventFilter(this);
-
     ui->graphicsViewBoard->setScene(m_uiGameScene);
 
-    // Todo set fixed size
+    // Todo set fixed size of graphicsView and of MainWindow itself.
+    // I don't know the size - look at ui option.
     //ui->graphicsViewBoard->setFixedSize(m_iWidgetSize - m_iWidgetBorder, m_iWidgetSize - m_iWidgetBorder);
     ui->graphicsViewBoard->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsViewBoard->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -39,17 +38,7 @@ void MainWindow::startNewGame()
     m_gameEngine = new GameEngine(this, m_uiGameScene, ui->textEditEvents, ui->textEditInfo);
     connect(m_uiGameScene, SIGNAL(newMouseEvent(QPointF)), m_gameEngine, SLOT(mouseReleased(QPointF)));
     ui->graphicsViewBoard->setScene(m_uiGameScene);
-    m_gameEngine->startGame(1);
-}
 
-//bool MainWindow::eventFilter(QObject *parent, QEvent *event)
-//{
-//    if (event->type() == QEvent::MouseButtonRelease)
-//    {
-//        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-//        // forward to graphicsView (via default MainWindow behaviour)
-//        qDebug() << "Mouse";
-//        QMainWindow::mouseReleaseEvent(mouseEvent);
-//    }
-//    return false;
-//}
+    // TODO implement number of human palyers correctly; let player choose number and color.
+    m_gameEngine->startGame(2);
+}

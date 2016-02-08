@@ -5,6 +5,8 @@ GameEngine::GameEngine(QObject *parent, UIGameScene *uiGameScene, QTextEdit *eve
     m_uiGameScene = uiGameScene;
     m_eventList = eventList;
     m_infoList = infoList;
+
+    m_legalMoves = new QVector<Square* >;
 }
 
 GameEngine::~GameEngine()
@@ -17,47 +19,133 @@ void GameEngine::startGame(int numberOfHumans)
     m_numberOfHumans = numberOfHumans;
     createPlayers(numberOfHumans);
 
+    // TODO use these variables...
+    m_numberOfActualMoves = 0;
+    m_numberOfTotalMoves = 0;
+    m_elapsedTime = 0;
+
     m_board = new Board(m_currentPlayer);
-
-
 
     connect(m_board, SIGNAL(signalBoardChanged(int,int,Player::Color)), this, SLOT(updateUI(int,int,Player::Color)));
 
-    connect(&loopQTimer, SIGNAL(timeout()), this, SLOT(loop()));
-
+    // show infos like whos turn it is and the time needed so far (TODO is this really needed?!).
     updateInfoText("Current Player");
 
+    // display legal moves for player that starts the game (usually black)
     showLegalMoves();
 
-    // TODO counter
-    loopQTimer.start(1000);
+    // TODO thinking timer start and stop (toggle, ...)
+    //connect(&m_thinkingTime, SIGNAL(timeout()), this, SLOT(loop()));
+    m_thinkingTime.start();
+    //timer.elapsed() << "milliseconds";
+
 }
 
 void GameEngine::mouseReleased(QPointF point)
 {
     int x = point.x() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberColumns;
     int y = point.y() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberRows;
+    // TODO comment all qDebug()s
     qDebug() << "Mouse pointer is at" << point << "x" << x << "y" << y;
-
     eventHandling(x, y);
-
 }
 
 void GameEngine::createPlayers(int numberOfHumans)
 {
-    m_humanPlayerB = new HumanPlayer(Player::BLACK);
-    m_humanPlayerW = new HumanPlayer(Player::WHITE);
-    m_computerPlayerB = new ComputerPlayer(Player::BLACK);
-    m_computerPlayerW = new ComputerPlayer(Player::WHITE);
+    if (numberOfHumans == 2)
+    {
+        m_humanPlayerB = new HumanPlayer(Player::BLACK);
+        m_humanPlayerW = new HumanPlayer(Player::WHITE);
+    }
+    else if (numberOfHumans == 1)
+    {
+        // TODO let palyer choose color
+        m_computerPlayerB = new ComputerPlayer(Player::BLACK);
+        m_humanPlayerW = new HumanPlayer(Player::WHITE);
+
+        //m_computerPlayerW = new ComputerPlayer(Player::WHITE);
+    }
 
     // TODO set players correctly according to parameter numberOfHumans
     m_currentPlayer = m_humanPlayerB;
     m_opponentPlayer = m_humanPlayerW;
 }
 
+bool GameEngine::gameOver()
+{
+    // check if current player has options to make a move
+    if (m_board->getLegalMoves(m_legalMoves) == true)
+    {
+        return false;
+    }
+
+    // make a pass if there are no legal moves left ...
+    makePass();
+    // ... and check if the opponent has legal moves left
+    if(m_board->getLegalMoves(m_legalMoves) == true) {
+        return false;
+    }
+
+    qDebug() << "Game Over";
+    return true;
+}
+
+QString GameEngine::getGameStats()
+{
+    QString gameResult;
+
+    m_board->countDisks();
+    int numberOfBlackDisks = m_board->m_numberOfBlackDisks;
+    int numberOfWhiteDisks = m_board->m_numberOfWhiteDisks;
+
+    // TODO is it needed?
+    int numberOfDisks = m_board->m_numberOfDisks;
+
+    // TODO check rules ... count empty squares too???
+    if (numberOfBlackDisks > numberOfWhiteDisks)
+    {
+        gameResult = QString(QString("Black player (") + QString::number(numberOfBlackDisks) + QString(") wins! \n") +
+                             QString("White player (") + QString::number(numberOfWhiteDisks) + QString(") loses."));
+    }
+    else if (numberOfWhiteDisks > numberOfBlackDisks)
+    {
+        gameResult = QString(QString("White player (") + QString::number(numberOfBlackDisks) + QString(") wins! \n") +
+                             QString("Black player (") + QString::number(numberOfWhiteDisks) + QString(") loses."));
+    }
+    else if (numberOfBlackDisks == numberOfWhiteDisks)
+    {
+        gameResult = QString(QString("Draw \n") + QString("Both players have ") + QString::number(numberOfBlackDisks));
+    }
+
+    return gameResult;
+}
+
+void GameEngine::makePass()
+{
+    if (m_currentPlayer->m_color == Player::BLACK)
+    {
+        updateInfoText("Black passed, it's White's turn");
+    }
+    else if (m_currentPlayer->m_color == Player::WHITE)
+    {
+        updateInfoText("White passed, it's Black's turn");
+    }
+    m_numberOfTotalMoves++;
+    togglePlayer();
+
+}
+
 void GameEngine::eventHandling(int x, int y)
 {
-    m_eventList->append(QString("(" + QString::number(x) + "," + QString::number(y) + ")"));
+    // first check if the game is over
+    if (gameOver())
+    {
+        QString gameStats = getGameStats();
+        updateInfoText(gameStats);
+    }
+
+    // this string will hopefully overwritten by a legal event.
+    QString eventString = "Something went wrong in eventHandling";
 
     Player::Color currentPlayer = m_currentPlayer->m_color;
     switch(currentPlayer)
@@ -65,9 +153,15 @@ void GameEngine::eventHandling(int x, int y)
     case Player::BLACK:
         if (m_board->legalMove(x, y))
         {
-            //makeMove(x, y);
             m_board->makeMove(x, y);
+            revertAllowedUISquares(x, y);
             updateUI(x, y, Player::BLACK);
+            m_numberOfActualMoves++;
+            m_numberOfTotalMoves++;
+            eventString = QString(QString::number(m_numberOfActualMoves) + ". Black played at (" +
+                                  QString::number(x) + "," + QString::number(y) +
+                                  ") in " + QString::number(getThinkingTime()) + " sec");
+
             togglePlayer();
         }
         break;
@@ -75,9 +169,15 @@ void GameEngine::eventHandling(int x, int y)
     case Player::WHITE:
         if (m_board->legalMove(x, y))
         {
-            //makeMove(x, y);
             m_board->makeMove(x, y);
+            revertAllowedUISquares(x, y);
             updateUI(x, y, Player::WHITE);
+            m_numberOfActualMoves++;
+            m_numberOfTotalMoves++;
+            eventString = QString(QString::number(m_numberOfActualMoves) + ". White played at (" +
+                                  QString::number(x) + "," + QString::number(y) +
+                                  ") in " + QString::number(getThinkingTime()) + " sec");
+
             togglePlayer();
         }
         break;
@@ -90,19 +190,25 @@ void GameEngine::eventHandling(int x, int y)
         qDebug() << "GameEngine::eventHandling" << "default case. Debug this";
         break;
     }
+
+    updateEventText(eventString);
+
+    // restart the stopwatch
+    m_thinkingTime.start();
 }
 
 void GameEngine::updateUI(int x, int y, Player::Color currentPlayer)
 {
+    // update chosen square with player color
     switch (currentPlayer) {
     case Player::BLACK:
-        m_uiGameScene->setSquareState(x, y, UISquare::BLACK, currentPlayer);
+        m_uiGameScene->setSquareState(x, y, UISquare::BLACK);
         break;
     case Player::WHITE:
-        m_uiGameScene->setSquareState(x, y, UISquare::WHITE, currentPlayer);
+        m_uiGameScene->setSquareState(x, y, UISquare::WHITE);
         break;
     case Player::NONE:
-        m_uiGameScene->setSquareState(x, y, UISquare::BOARD, currentPlayer);
+        m_uiGameScene->setSquareState(x, y, UISquare::BOARD);
         break;
     default:
         break;
@@ -129,8 +235,21 @@ void GameEngine::updateInfoText(QString string)
     }
 }
 
+void GameEngine::updateEventText(QString string)
+{
+    m_eventList->append(string);
+}
+
+double GameEngine::getThinkingTime()
+{
+    m_elapsedTime = m_thinkingTime.elapsed();
+    m_elapsedTime = m_elapsedTime/1000;
+}
+
 void GameEngine::togglePlayer()
 {
+
+
     switch(m_currentPlayer->m_color)
     {
     case Player::BLACK:
@@ -153,76 +272,29 @@ void GameEngine::togglePlayer()
 
 void GameEngine::showLegalMoves()
 {
-    QVector<Square* > *legalMoves = new QVector<Square* >;
-    //int * pointer = new int();
+    // clear list first (forget previous legal moves)
+    m_legalMoves->clear();
 
     // check if there are legal moves available before actually trying to redraw some.
-
-    bool legalMovesAvailable = m_board->getLegalMoves(legalMoves);
+    bool legalMovesAvailable = m_board->getLegalMoves(m_legalMoves);
     if (legalMovesAvailable == true)
     {
-        foreach (Square *square, *legalMoves) {
-            m_uiGameScene->setSquareState(square->m_x, square->m_y, UISquare::ALLOWED, m_currentPlayer->m_color);
+        foreach (Square *square, *m_legalMoves) {
+            m_uiGameScene->setSquareState(square->m_x, square->m_y, UISquare::ALLOWED);
         }
     }
 }
 
-//void GameEngine::makeMove(int x, int y)
-//{
-//    // TODO update number of moves if valid;
-//    // TODO append to a tree?!
-
-//    for(int dir = 0; dir < BOARD_SIZE; dir++)
-//    {
-//        int dx = m_board->m_direction[dir][0];
-//        int dy = m_board->m_direction[dir][1];
-//        int tx = x + 2*dx;
-//        int ty = y + 2*dy;
-//        // need to be at least 2 grids away from the edge
-//        if (!m_board->onBoard(tx, ty))
-//        {
-//            continue;
-//        }
-//        // oppenent piece must be adjacent in the current direction
-//        if (m_board->getSquare(x+dx, y+dy)->getOwner() != m_opponentPlayer->m_color)
-//        {
-//            continue;
-//        }
-//        // as long as we stay on the board going in the current direction, we search for the surrounding disk
-//        while(m_board->onBoard(tx, ty) && m_board->getSquare(tx, ty)->getOwner() == m_opponentPlayer->m_color)
-//        {
-//            tx += dx;
-//            ty += dy;
-//        }
-//        // if we are still on the board and we found the surrounding disk in the current direction
-//        // the move is legal.
-
-//        // go back and flip the pieces if move is legal
-//        if(m_board->onBoard(tx, ty) && m_board->getSquare(tx, ty)->getOwner() == m_currentPlayer->m_color)
-//        {
-//            tx -= dx;
-//            ty -= dy;
-
-//            while(m_board->getSquare(tx, ty)->getOwner() == m_opponentPlayer->m_color)
-//            {
-//                qDebug() << "Flipping" << tx << "," << ty;
-//                m_board->getSquare(tx, ty)->setOwner(m_currentPlayer->m_color);
-//                if (m_currentPlayer->m_color == Player::BLACK)
-//                {
-//                    updateUI(tx, ty, UISquare::BLACK, Player::BLACK);
-//                }
-//                else
-//                {
-//                    updateUI(tx, ty, UISquare::WHITE, Player::WHITE);
-//                }
-//                tx -= dx;
-//                ty -= dy;
-//            }
-//            // set color of placed disk to current player
-//            m_board->getSquare(x, y)->setOwner(m_currentPlayer->m_color);
-//        }
-//    }
-//}
+void GameEngine::revertAllowedUISquares(int x, int y)
+{
+    // revert allowed squares to Board state that were NOT picked by current player
+    Square *movedSquare = m_board->getSquare(x, y);
+    m_legalMoves->removeOne(movedSquare);
+    foreach (Square *square, *m_legalMoves)
+    {
+        updateUI(square->m_x, square->m_y, Player::NONE);
+    }
+}
 
 void GameEngine::counter()
 {
