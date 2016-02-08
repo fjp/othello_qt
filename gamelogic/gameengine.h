@@ -38,6 +38,8 @@ private:
      */
     bool gameOver(void);
 
+    bool m_gameOver;
+
     /**
      * @brief getGameStats summarize game statistics
      */

@@ -47,10 +47,10 @@ void Board::newBoard()
         }
     }
 
-    m_boardMatrix[3][3]->setSquareState(Square::BLACK);
-    m_boardMatrix[3][4]->setSquareState(Square::WHITE);
-    m_boardMatrix[4][3]->setSquareState(Square::WHITE);
-    m_boardMatrix[4][4]->setSquareState(Square::BLACK);
+    m_boardMatrix[3][3]->setSquareState(Square::WHITE);
+    m_boardMatrix[3][4]->setSquareState(Square::BLACK);
+    m_boardMatrix[4][3]->setSquareState(Square::BLACK);
+    m_boardMatrix[4][4]->setSquareState(Square::WHITE);
 
     m_numberOfBlackDisks = 2;
     m_numberOfWhiteDisks = 2;

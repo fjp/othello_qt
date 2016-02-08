@@ -24,6 +24,8 @@ void GameEngine::startGame(int numberOfHumans)
     m_numberOfTotalMoves = 0;
     m_elapsedTime = 0;
 
+    m_gameOver = false;
+
     m_board = new Board(m_currentPlayer);
 
     connect(m_board, SIGNAL(signalBoardChanged(int,int,Player::Color)), this, SLOT(updateUI(int,int,Player::Color)));
@@ -85,8 +87,12 @@ bool GameEngine::gameOver()
     if(m_board->getLegalMoves(m_legalMoves) == true) {
         return false;
     }
-
     qDebug() << "Game Over";
+
+    m_gameOver = true;
+    QString gameStats = getGameStats();
+    updateInfoText(gameStats);
+
     return true;
 }
 
@@ -109,8 +115,8 @@ QString GameEngine::getGameStats()
     }
     else if (numberOfWhiteDisks > numberOfBlackDisks)
     {
-        gameResult = QString(QString("White player (") + QString::number(numberOfBlackDisks) + QString(") wins! \n") +
-                             QString("Black player (") + QString::number(numberOfWhiteDisks) + QString(") loses."));
+        gameResult = QString(QString("White player (") + QString::number(numberOfWhiteDisks) + QString(") wins! \n") +
+                             QString("Black player (") + QString::number(numberOfBlackDisks) + QString(") loses."));
     }
     else if (numberOfBlackDisks == numberOfWhiteDisks)
     {
@@ -138,11 +144,8 @@ void GameEngine::makePass()
 void GameEngine::eventHandling(int x, int y)
 {
     // first check if the game is over
-    if (gameOver())
-    {
-        QString gameStats = getGameStats();
-        updateInfoText(gameStats);
-    }
+    if (m_gameOver)
+        return;
 
     // this string will hopefully overwritten by a legal event.
     QString eventString = "Something went wrong in eventHandling";
@@ -199,6 +202,13 @@ void GameEngine::eventHandling(int x, int y)
     default:
         qDebug() << "GameEngine::eventHandling" << "default case. Debug this";
         break;
+    }
+
+
+    bool movesAvailable = m_board->getLegalMoves(NULL);
+    if (!movesAvailable)
+    {
+        gameOver();
     }
 
     updateEventText(eventString);

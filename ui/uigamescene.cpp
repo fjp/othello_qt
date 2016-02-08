@@ -59,8 +59,8 @@ void UIGameScene::drawBoard()
             m_board[x][y]->setSize(m_squareHeight, m_squareWidth);
         }
     }
-    m_board[3][3]->setState(UISquare::BLACK);
-    m_board[3][4]->setState(UISquare::WHITE);
-    m_board[4][3]->setState(UISquare::WHITE);
-    m_board[4][4]->setState(UISquare::BLACK);
+    m_board[3][3]->setState(UISquare::WHITE);
+    m_board[3][4]->setState(UISquare::BLACK);
+    m_board[4][3]->setState(UISquare::BLACK);
+    m_board[4][4]->setState(UISquare::WHITE);
 }
