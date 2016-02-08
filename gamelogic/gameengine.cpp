@@ -43,10 +43,20 @@ void GameEngine::startGame(int numberOfHumans, double timeLimit)
     m_thinkingTime.start();
     //timer.elapsed() << "milliseconds";
 
+    if (m_numberOfHumans == 1)
+    {
+
+    }
+
 }
 
 void GameEngine::mouseReleased(QPointF point)
 {
+    if (m_numberOfHumans == 1 && m_currentPlayer->getPlayerType() == Player::COMPUTER)
+    {
+        qDebug() << "Computer move! Don't click!";
+        return;
+    }
     int x = point.x() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberColumns;
     int y = point.y() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberRows;
     // TODO comment all qDebug()s
@@ -60,19 +70,19 @@ void GameEngine::createPlayers(int numberOfHumans)
     {
         m_humanPlayerB = new HumanPlayer(Player::BLACK);
         m_humanPlayerW = new HumanPlayer(Player::WHITE);
+        m_currentPlayer = m_humanPlayerB;
+        m_opponentPlayer = m_humanPlayerW;
     }
     else if (numberOfHumans == 1)
     {
         // TODO let palyer choose color
         m_computerPlayerB = new ComputerPlayer(Player::BLACK);
         m_humanPlayerW = new HumanPlayer(Player::WHITE);
-
-        //m_computerPlayerW = new ComputerPlayer(Player::WHITE);
+        m_currentPlayer = m_computerPlayerB;
+        m_opponentPlayer = m_humanPlayerW;
     }
 
     // TODO set players correctly according to parameter numberOfHumans
-    m_currentPlayer = m_humanPlayerB;
-    m_opponentPlayer = m_humanPlayerW;
 }
 
 bool GameEngine::gameOver()

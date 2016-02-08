@@ -43,15 +43,12 @@ void MainWindow::startNewGame()
     connect(m_uiGameScene, SIGNAL(newMouseEvent(QPointF)), m_gameEngine, SLOT(mouseReleased(QPointF)));
     //ui->graphicsViewBoard->setScene(m_uiGameScene);
 
-    // TODO implement number of human palyers correctly; let player choose number and color.
+    // TODO let palyer choose color.
 
     // get selection from comboBox
     int numberOfHumanPlayers = ui->comboBoxNumberOfHumans->currentIndex() + 1;
-
-
-
+    // get user input for time limit
     double timeLimit = ui->lineEditTimeLimit->text().toDouble();
-
 
     m_gameEngine->startGame(numberOfHumanPlayers, timeLimit);
 }

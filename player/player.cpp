@@ -9,3 +9,8 @@ void Player::setPlayerColor(Player::Color color)
 {
     m_color = color;
 }
+
+Player::PlayerType Player::getPlayerType()
+{
+     return PlayerType::UNKNOWN;
+}

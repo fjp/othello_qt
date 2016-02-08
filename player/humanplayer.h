@@ -8,6 +8,8 @@ class HumanPlayer : public Player
 public:
     HumanPlayer(Player::Color color);
 
+    virtual PlayerType getPlayerType();
+
 signals:
 
 public slots:
