@@ -32,10 +32,19 @@ void Board::newBoard()
     m_boardMatrix[3][4]->setSquareState(Square::WHITE);
     m_boardMatrix[4][3]->setSquareState(Square::WHITE);
     m_boardMatrix[4][4]->setSquareState(Square::BLACK);
+
+    m_numberOfBlackDisks = 2;
+    m_numberOfWhiteDisks = 2;
+    m_numberOfDisks = 4;
 }
 
 void Board::countDisks(void)
 {
+    m_numberOfBlackDisks = 0;
+    m_numberOfWhiteDisks = 0;
+    m_numberOfDisks = 0;
+
+
     Player::Color currentOwner;
     for (int x = 0; x < BOARD_SIZE; x++)
     {
@@ -54,11 +63,14 @@ void Board::countDisks(void)
             }
         }
     }
+    qDebug() << "There are" << m_numberOfBlackDisks << "Black disks";
+    qDebug() << "There are" << m_numberOfWhiteDisks << "White disks";
+    qDebug() << "There are" << m_numberOfDisks << "total disks";
 }
 
 bool Board::legalMove(int x, int y)
 {
-    qDebug() << "--------------------------- Check new legal Move at -------------------------------";
+    //qDebug() << "--------------------------- Check new legal Move at -------------------------------";
     // check if inside board
     if(!onBoard(x, y))
     {
@@ -69,7 +81,7 @@ bool Board::legalMove(int x, int y)
     {
         return false;
     }
-    qDebug() << "Board(" << x << "," << y << ") is not occupied" << m_boardMatrix[x][y]->getOwner() << "Square State" << m_boardMatrix[x][y]->getSquareState();
+    //qDebug() << "Board(" << x << "," << y << ") is not occupied" << m_boardMatrix[x][y]->getOwner() << "Square State" << m_boardMatrix[x][y]->getSquareState();
     // test left for possible flips
     bool moveLegal = false;
     for(int dir = 0; dir < BOARD_SIZE; dir++)
@@ -83,16 +95,16 @@ bool Board::legalMove(int x, int y)
         {
             continue;
         }
-        qDebug() << "(tx,ty) = (" << tx << "," << ty << ") is on the board";
+        //qDebug() << "(tx,ty) = (" << tx << "," << ty << ") is on the board";
 
         // oppenent disk must be adjacent in the current direction
         if (m_boardMatrix[x+dx][y+dy]->getOwner() != getOtherPlayer(m_currentPlayer))
         {
             QString string = QString(getOtherPlayer(m_currentPlayer));
-            qDebug() << "but there is no adjacent opponent" << string;
+            //qDebug() << "but there is no adjacent opponent" << string;
             continue;
         }
-        qDebug() << "Adjacent opponent" << getOtherPlayer(m_currentPlayer) << "found at ([x+dx],[y+dy]) = (" << x+dx << "," << y+dy << ") CurrentPlayer is" << m_currentPlayer->m_color;
+        //qDebug() << "Adjacent opponent" << getOtherPlayer(m_currentPlayer) << "found at ([x+dx],[y+dy]) = (" << x+dx << "," << y+dy << ") CurrentPlayer is" << m_currentPlayer->m_color;
 
         // as long as we stay on the board going in the current direction, we search for the surrounding disk
         while(onBoard(tx, ty) && m_boardMatrix[tx][ty]->getOwner() == getOtherPlayer(m_currentPlayer))
@@ -105,12 +117,12 @@ bool Board::legalMove(int x, int y)
         // the move is legal.
         if(onBoard(tx, ty) && m_boardMatrix[tx][ty]->getOwner() == m_currentPlayer->m_color)
         {
-            qDebug() << "Found surrounding disk of Player" << m_currentPlayer->m_color << "at (tx,ty) = (" << tx << "," << ty << ")";
+            //qDebug() << "Found surrounding disk of Player" << m_currentPlayer->m_color << "at (tx,ty) = (" << tx << "," << ty << ")";
             moveLegal = true;
             break;
         }
     }
-    qDebug() << "Board::legalMove" << moveLegal;
+    //qDebug() << "Board::legalMove" << moveLegal;
     return moveLegal;
 
 }
@@ -177,7 +189,7 @@ void Board::makeMove(int x, int y)
 
             while(m_boardMatrix[tx][ty]->getOwner() == getOtherPlayer(m_currentPlayer))
             {
-                qDebug() << "Flipping" << tx << "," << ty;
+                //qDebug() << "Flipping" << tx << "," << ty;
                 m_boardMatrix[tx][ty]->setOwner(m_currentPlayer->m_color);
                 if (m_currentPlayer->m_color == Player::BLACK)
                 {

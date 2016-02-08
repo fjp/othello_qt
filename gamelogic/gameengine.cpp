@@ -46,7 +46,7 @@ void GameEngine::mouseReleased(QPointF point)
     int x = point.x() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberColumns;
     int y = point.y() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberRows;
     // TODO comment all qDebug()s
-    qDebug() << "Mouse pointer is at" << point << "x" << x << "y" << y;
+    //qDebug() << "Mouse pointer is at" << point << "x" << x << "y" << y;
     eventHandling(x, y);
 }
 
@@ -164,6 +164,11 @@ void GameEngine::eventHandling(int x, int y)
 
             togglePlayer();
         }
+        // check if game is over if no legal move possible
+        else
+        {
+            gameOver();
+        }
         break;
 
     case Player::WHITE:
@@ -180,6 +185,11 @@ void GameEngine::eventHandling(int x, int y)
 
             togglePlayer();
         }
+        // check if game is over if no legal move possible
+        else
+        {
+            gameOver();
+        }
         break;
 
     case Player::NONE:
@@ -194,6 +204,7 @@ void GameEngine::eventHandling(int x, int y)
     updateEventText(eventString);
 
     // restart the stopwatch
+    m_elapsedTime = 0;
     m_thinkingTime.start();
 }
 
@@ -243,12 +254,15 @@ void GameEngine::updateEventText(QString string)
 double GameEngine::getThinkingTime()
 {
     m_elapsedTime = m_thinkingTime.elapsed();
-    m_elapsedTime = m_elapsedTime/1000;
+    m_elapsedTime = m_elapsedTime/1000.0;
+    return m_elapsedTime;
 }
 
 void GameEngine::togglePlayer()
 {
 
+    // TODO comment or delet; just for debugging
+    m_board->countDisks();
 
     switch(m_currentPlayer->m_color)
     {

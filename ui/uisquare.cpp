@@ -107,6 +107,8 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             break;
     }
 
+
+    // TODO comment; used for debugging to see the square positions.
     QString owner;
     switch (m_currentOwner)
     {

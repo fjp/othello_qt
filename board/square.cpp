@@ -55,7 +55,7 @@ Player::Color Square::getOwner()
 void Square::setOwner(Player::Color currentOwner)
 {
     m_currentOwner = currentOwner;
-    qDebug() << "Square::setOwner" << m_currentOwner;
+    //qDebug() << "Square::setOwner" << m_currentOwner;
 }
 
 

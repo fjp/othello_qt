@@ -29,7 +29,7 @@ UIGameScene::~UIGameScene()
 
 void UIGameScene::setSquareState(int x, int y, UISquare::State state)
 {
-    qDebug() << "UIGameScene::setSquareState:" << "x,y" << x << "," << y << "State"<< state;
+    //qDebug() << "UIGameScene::setSquareState:" << "x,y" << x << "," << y << "State"<< state;
     m_board[x][y]->setState(state);
 }
 
