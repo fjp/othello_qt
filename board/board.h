@@ -15,11 +15,12 @@ class Board : public QObject
     Q_OBJECT
 public:
     explicit Board(Player *currentPlayer, QObject *parent = 0);
+    Board(const Board &board);
 
     // TODO move intitialization to constructor
     const int m_direction[8][2] = {{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}};
 
-    Square *getSquare(int x, int y);
+    Square *getSquare(int x, int y) const;
     Square::State getSquareState(int x, int y);
 
     void newBoard();
@@ -35,6 +36,8 @@ public:
     int m_numberOfBlackDisks;
     int m_numberOfWhiteDisks;
     int m_numberOfDisks;
+
+    bool m_gameOver;
 
 
     /**
@@ -52,6 +55,10 @@ public:
      * @return
      */
     bool getLegalMoves(QVector<Square *> *legalMoves);
+
+    QVector<Square* > *m_legalMoves;
+
+    QVector<Board *> makeLegalMoves();
 
     /**
      * @brief makeMove actually make a move that is legal.
@@ -75,6 +82,8 @@ public:
      * @return
      */
     Player::Color getOtherPlayer(Player *currentPlayer);
+
+
 
 
 private:

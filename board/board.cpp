@@ -7,7 +7,24 @@ Board::Board(Player *currentPlayer, QObject *parent) : QObject(parent),
     newBoard();
 }
 
-Square *Board::getSquare(int x, int y)
+Board::Board(const Board &board)
+{
+    m_legalMoves = new QVector<Square* >;
+
+    // copy the board
+    for (int x = 0; x < BOARD_SIZE; x++)
+    {
+        for (int y = 0; y < BOARD_SIZE; y++)
+        {
+
+            m_boardMatrix[x][y] = board.getSquare(x,y);
+        }
+    }
+
+    m_gameOver = board.m_gameOver;
+}
+
+Square *Board::getSquare(int x, int y) const
 {
     return m_boardMatrix[x][y];
 }
@@ -19,6 +36,8 @@ Square::State Board::getSquareState(int x, int y)
 
 void Board::newBoard()
 {
+    m_legalMoves = new QVector<Square* >;
+
     for (int x = 0; x < BOARD_SIZE; x++)
     {
         for (int y = 0; y < BOARD_SIZE; y++)
@@ -36,6 +55,8 @@ void Board::newBoard()
     m_numberOfBlackDisks = 2;
     m_numberOfWhiteDisks = 2;
     m_numberOfDisks = 4;
+
+    m_gameOver = false;
 }
 
 void Board::countDisks(void)
@@ -129,6 +150,13 @@ bool Board::legalMove(int x, int y)
 
 bool Board::getLegalMoves(QVector<Square* > *legalMoves)
 {
+    // this function appends possible moves (legal squares) to the provided QVector legalMoves.
+    // this also updates the member variable m_legalMoves. A NULL parameter is use by board itself.
+    if (legalMoves == NULL)
+    {
+        legalMoves = new QVector<Square* >;
+    }
+
     Square *allowedSquare = NULL;
     bool legalMovesAvailable = false;
     for(int x = 0; x < BOARD_SIZE; x++)
@@ -148,7 +176,24 @@ bool Board::getLegalMoves(QVector<Square* > *legalMoves)
             }
         }
     }
+    m_legalMoves = legalMoves;
     return legalMovesAvailable;
+}
+
+QVector<Board *> Board::makeLegalMoves()
+{
+    QVector<Board *> possibleBoards(1);
+
+    // get possible moves (squares)
+    getLegalMoves(NULL);
+
+    // foreach possible move in m_legalMoves list append the future board to QVector.
+    foreach (Square *square, *m_legalMoves)
+    {
+        Board *tempBoard = new Board(*this);
+        tempBoard->makeMove(square->m_x, square->m_y);
+        possibleBoards.append(tempBoard);
+    }
 }
 
 void Board::makeMove(int x, int y)
@@ -194,11 +239,13 @@ void Board::makeMove(int x, int y)
                 if (m_currentPlayer->m_color == Player::BLACK)
                 {
                     //updateUI(tx, ty, UISquare::BLACK, Player::BLACK);
+                    // TODO: avoid emit if AI move
                     emit signalBoardChanged(tx, ty, Player::BLACK);
                 }
                 else
                 {
                     //updateUI(tx, ty, UISquare::WHITE, Player::WHITE);
+                    // TODO: avoid emit if AI move
                     emit signalBoardChanged(tx, ty, Player::WHITE);
                 }
 

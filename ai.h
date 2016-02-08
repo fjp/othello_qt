@@ -55,11 +55,19 @@ but just whether it can win. The brute-force evaluation function kicks in at the
 when the board is nearly full (the default cut-off is 14 empty squares left).
 */
 
+#include "board/board.h"
+#include "player/player.h"
+
 class AI
 {
 
 public:
     AI();
+
+private:
+    int alphaBeta(Board *board, int depth, int alpha, int beta, bool maximizingPlayer);
+
+    int evaluateBoard(Board *board);
 };
 
 #endif // AI_H
