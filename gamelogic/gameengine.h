@@ -24,7 +24,7 @@ public:
 
     void registerHumanPlayer(HumanPlayer player);
 
-    void startGame(int numberOfHumans);
+    void startGame(int numberOfHumans = 1, double timeLimit = 10);
 
     Board *m_board;
     
@@ -113,6 +113,11 @@ private:
      * @brief numberOfTotalMoves number of total moves including passes.
      */
     int m_numberOfTotalMoves;
+
+    /**
+     * @brief m_timeLimit user defined max time limit for AI.
+     */
+    double m_timeLimit;
 
     /**
      * @brief m_elapsedTime used to display the time needed to make a move.

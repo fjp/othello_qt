@@ -20,6 +20,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->textEditEvents->setWordWrapMode(QTextOption::WordWrap);
     ui->textEditInfo->setWordWrapMode(QTextOption::WordWrap);
 
+    // check if time input is double!!!!!
+    ui->lineEditTimeLimit->setValidator(new QDoubleValidator(0, 100, 2, this));
+
     connect(ui->pushButtonNewGame, SIGNAL(released()), this, SLOT(startNewGame()));
 }
 
@@ -41,5 +44,14 @@ void MainWindow::startNewGame()
     //ui->graphicsViewBoard->setScene(m_uiGameScene);
 
     // TODO implement number of human palyers correctly; let player choose number and color.
-    m_gameEngine->startGame(2);
+
+    // get selection from comboBox
+    int numberOfHumanPlayers = ui->comboBoxNumberOfHumans->currentIndex() + 1;
+
+
+
+    double timeLimit = ui->lineEditTimeLimit->text().toDouble();
+
+
+    m_gameEngine->startGame(numberOfHumanPlayers, timeLimit);
 }

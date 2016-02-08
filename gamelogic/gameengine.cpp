@@ -14,10 +14,12 @@ GameEngine::~GameEngine()
 
 }
 
-void GameEngine::startGame(int numberOfHumans)
+void GameEngine::startGame(int numberOfHumans, double timeLimit)
 {
     m_numberOfHumans = numberOfHumans;
-    createPlayers(numberOfHumans);
+    createPlayers(m_numberOfHumans);
+
+    m_timeLimit = timeLimit;
 
     // TODO use these variables...
     m_numberOfActualMoves = 0;
