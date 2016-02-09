@@ -1,8 +1,20 @@
 #include "ai.h"
 
-AI::AI()
+AI::AI(Board *currentBoard)
 {
+    m_currentBoard = currentBoard;
+}
 
+Square* AI::makeMove(Board *currentBoard)
+{
+    QVector<Square* > *legalMoves = new QVector<Square* >;
+
+    currentBoard->getLegalMoves(legalMoves);
+
+    Square *square = legalMoves->first();
+    currentBoard->makeMove(square->m_x, square->m_y);
+
+    return square;
 }
 
 int AI::alphaBeta(Board *board, int depth, int alpha, int beta, bool maximizingPlayer)
@@ -52,7 +64,7 @@ int AI::alphaBeta(Board *board, int depth, int alpha, int beta, bool maximizingP
 
 }
 
-int AI::evaluateBoard(Board *board)
+int AI::evaluateBoard(Board *currentBoard)
 {
 
 }

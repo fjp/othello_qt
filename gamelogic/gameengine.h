@@ -14,6 +14,7 @@
 #include "player/computerplayer.h"
 #include "player/humanplayer.h"
 #include "ui/uigamescene.h"
+#include "ai.h"
 
 class GameEngine : public QObject
 {
@@ -154,6 +155,9 @@ private:
     ComputerPlayer* m_computerPlayerB;
     ComputerPlayer* m_computerPlayerW;
     QList<Player *> players;
+
+
+    AI *m_ai;
 
 
 private slots:

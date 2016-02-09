@@ -8,7 +8,7 @@ class HumanPlayer : public Player
 public:
     HumanPlayer(Player::Color color);
 
-    virtual PlayerType getPlayerType();
+    //virtual PlayerType getPlayerType();
 
 signals:
 

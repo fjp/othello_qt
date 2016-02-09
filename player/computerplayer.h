@@ -8,7 +8,7 @@ class ComputerPlayer : public Player
 public:
     ComputerPlayer(Player::Color color);
 
-    virtual PlayerType getPlayerType();
+    //virtual PlayerType getPlayerType();
 
 signals:
 

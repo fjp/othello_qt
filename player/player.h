@@ -8,13 +8,14 @@ class Player : public QObject
     Q_OBJECT
 public:
     enum Color {NONE, BLACK, WHITE} m_color;
-    enum PlayerType {UNKNOWN, HUMAN, COMPUTER};
+    enum Type {UNKNOWN, HUMAN, COMPUTER} m_type;
 
     explicit Player(QObject *parent = 0, Color color = NONE);
 
     void setPlayerColor(Color color);
+    void setPlayerType(Type type);
 
-    virtual PlayerType getPlayerType();
+    //virtual PlayerType getPlayerType();
 
 
 signals:

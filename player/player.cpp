@@ -3,6 +3,7 @@
 Player::Player(QObject *parent, Color color) : QObject(parent)
 {
     m_color = color;
+    m_type = UNKNOWN;
 }
 
 void Player::setPlayerColor(Player::Color color)
@@ -10,7 +11,12 @@ void Player::setPlayerColor(Player::Color color)
     m_color = color;
 }
 
-Player::PlayerType Player::getPlayerType()
+void Player::setPlayerType(Player::Type type)
 {
-     return PlayerType::UNKNOWN;
+    m_type = type;
 }
+
+//Player::Type Player::getPlayerType()
+//{
+//     return Type::UNKNOWN;
+//}

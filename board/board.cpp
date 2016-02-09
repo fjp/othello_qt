@@ -156,6 +156,10 @@ bool Board::getLegalMoves(QVector<Square* > *legalMoves)
     {
         legalMoves = new QVector<Square* >;
     }
+    else
+    {
+        legalMoves->clear();
+    }
 
     Square *allowedSquare = NULL;
     bool legalMovesAvailable = false;
@@ -254,6 +258,21 @@ void Board::makeMove(int x, int y)
             }
             // set color of placed disk to current player
             m_boardMatrix[x][y]->setOwner(m_currentPlayer->m_color);
+
+            // TODO this needs some improvement - see also inside while loop
+            if (m_currentPlayer->m_color == Player::BLACK)
+            {
+                //updateUI(tx, ty, UISquare::BLACK, Player::BLACK);
+                // TODO: avoid emit if AI move
+                emit signalBoardChanged(x, y, Player::BLACK);
+            }
+            else
+            {
+                //updateUI(tx, ty, UISquare::WHITE, Player::WHITE);
+                // TODO: avoid emit if AI move
+                emit signalBoardChanged(x, y, Player::WHITE);
+            }
+
         }
     }
 }

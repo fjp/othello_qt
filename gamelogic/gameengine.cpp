@@ -43,16 +43,23 @@ void GameEngine::startGame(int numberOfHumans, double timeLimit)
     m_thinkingTime.start();
     //timer.elapsed() << "milliseconds";
 
-    if (m_numberOfHumans == 1)
-    {
+    // create the AI
+    m_ai = new AI(m_board);
 
+
+    if (m_numberOfHumans == 1 && m_currentPlayer->m_type == Player::COMPUTER)
+    {
+        Square* square = m_ai->makeMove(m_board);
+        revertAllowedUISquares(square->m_x, square->m_y);
+        togglePlayer();
     }
 
 }
 
 void GameEngine::mouseReleased(QPointF point)
 {
-    if (m_numberOfHumans == 1 && m_currentPlayer->getPlayerType() == Player::COMPUTER)
+    qDebug() << "PlayerType" << m_currentPlayer->m_type;
+    if (m_numberOfHumans == 1 && m_currentPlayer->m_type == Player::COMPUTER)
     {
         qDebug() << "Computer move! Don't click!";
         return;
@@ -217,7 +224,7 @@ void GameEngine::eventHandling(int x, int y)
     }
 
 
-    bool movesAvailable = m_board->getLegalMoves(NULL);
+    bool movesAvailable = m_board->getLegalMoves(m_legalMoves);
     if (!movesAvailable)
     {
         gameOver();
@@ -286,30 +293,94 @@ void GameEngine::togglePlayer()
     // TODO comment or delet; just for debugging
     m_board->countDisks();
 
+    Player **dummyPlayer;
+
+    // TODO swap pointers?????????? this is #?!
     switch(m_currentPlayer->m_color)
     {
     case Player::BLACK:
+        qDebug() << "BLACK GameEngine::togglePlayer before" << "m_currentPlayer" << m_currentPlayer;
+        qDebug() << "BLACK GameEngine::togglePlayer before" << "m_opponentPlayer" << m_currentPlayer;
         m_currentPlayer->m_color = Player::WHITE;
         m_opponentPlayer->m_color = Player::BLACK;
+
+        // TODO this is only correct if there is a computer player.
+        if (m_currentPlayer->m_type == Player::COMPUTER)
+        {
+            m_currentPlayer->m_type = Player::HUMAN;
+        }
+        else if (m_currentPlayer->m_type == Player::HUMAN)
+        {
+            m_currentPlayer->m_type = Player::COMPUTER;
+        }
+
+        if (m_opponentPlayer->m_type == Player::COMPUTER)
+        {
+            m_opponentPlayer->m_type = Player::HUMAN;
+        }
+        else if (m_opponentPlayer->m_type == Player::HUMAN)
+        {
+            m_opponentPlayer->m_type = Player::COMPUTER;
+        }
+
+
+        //dummyPlayer = &m_currentPlayer;
+        //m_currentPlayer = &m_opponentPlayer;
+        //m_opponentPlayer = &dummyPlayer;
+        //qDebug() << "BLACK GameEngine::togglePlayer after" << "m_currentPlayer" << m_currentPlayer;
+        //qDebug() << "BLACK GameEngine::togglePlayer after" << "m_opponentPlayer" << m_currentPlayer;
         break;
     case Player::WHITE:
+        qDebug() << "WHITE GameEngine::togglePlayer before" << "m_currentPlayer" << m_currentPlayer;
+        qDebug() << "WHITE GameEngine::togglePlayer before" << "m_opponentPlayer" << m_currentPlayer;
         m_currentPlayer->m_color = Player::BLACK;
         m_opponentPlayer->m_color = Player::WHITE;
+
+        if (m_currentPlayer->m_type == Player::COMPUTER)
+        {
+            m_currentPlayer->m_type = Player::HUMAN;
+        }
+        else if (m_currentPlayer->m_type == Player::HUMAN)
+        {
+            m_currentPlayer->m_type = Player::COMPUTER;
+        }
+
+        if (m_opponentPlayer->m_type == Player::COMPUTER)
+        {
+            m_opponentPlayer->m_type = Player::HUMAN;
+        }
+        else if (m_opponentPlayer->m_type == Player::HUMAN)
+        {
+            m_opponentPlayer->m_type = Player::COMPUTER;
+        }
+
+        qDebug() << "WHITE GameEngine::togglePlayer after" << "m_currentPlayer" << m_currentPlayer;
+        qDebug() << "WHITE GameEngine::togglePlayer after" << "m_opponentPlayer" << m_currentPlayer;
         break;
     default:
         m_currentPlayer->m_color = Player::NONE;
         m_opponentPlayer->m_color = Player::NONE;
+        qDebug() << "togglePlayers: default case?!";
+        break;
     }
     updateInfoText("Current Player");
-    qDebug() << "GameEngine::nextPlayer" << m_currentPlayer->m_color;
+    //qDebug() << "GameEngine::nextPlayer" << m_currentPlayer->m_color;
 
     showLegalMoves();
+
+    // make a new computer move if it is his turn.
+    if (m_numberOfHumans == 1 && m_currentPlayer->m_type == Player::COMPUTER)
+    {
+        Square* square = m_ai->makeMove(m_board);
+        revertAllowedUISquares(square->m_x, square->m_y);
+        togglePlayer();
+    }
 }
 
 void GameEngine::showLegalMoves()
 {
     // clear list first (forget previous legal moves)
-    m_legalMoves->clear();
+    //m_legalMoves->clear();
 
     // check if there are legal moves available before actually trying to redraw some.
     bool legalMovesAvailable = m_board->getLegalMoves(m_legalMoves);
