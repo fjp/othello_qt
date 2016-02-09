@@ -103,7 +103,8 @@ bool GameEngine::gameOver()
     // make a pass if there are no legal moves left ...
     makePass();
     // ... and check if the opponent has legal moves left
-    if(m_board->getLegalMoves(m_legalMoves) == true) {
+    if(m_board->getLegalMoves(m_legalMoves) == true)
+    {
         return false;
     }
     qDebug() << "Game Over";
@@ -187,10 +188,10 @@ void GameEngine::eventHandling(int x, int y)
             togglePlayer();
         }
         // check if game is over if no legal move possible
-        else
-        {
-            gameOver();
-        }
+//        else
+//        {
+//            gameOver();
+//        }
         break;
 
     case Player::WHITE:
@@ -208,10 +209,10 @@ void GameEngine::eventHandling(int x, int y)
             togglePlayer();
         }
         // check if game is over if no legal move possible
-        else
-        {
-            gameOver();
-        }
+//        else
+//        {
+//            gameOver();
+//        }
         break;
 
     case Player::NONE:
@@ -230,13 +231,11 @@ void GameEngine::eventHandling(int x, int y)
         gameOver();
     }
 
-
     updateEventText(eventString);
 
     // restart the stopwatch
     m_elapsedTime = 0;
     m_thinkingTime.start();
-
 
     // make a new computer move if it is his turn.
     if (!gameOver() && m_numberOfHumans == 1 && m_currentPlayer->m_type == Player::COMPUTER)
@@ -342,21 +341,13 @@ void GameEngine::togglePlayer()
         if (m_currentPlayer->m_type == Player::COMPUTER)
         {
             m_currentPlayer->m_type = Player::HUMAN;
+            m_opponentPlayer->m_type = Player::COMPUTER;
         }
         else if (m_currentPlayer->m_type == Player::HUMAN)
         {
             m_currentPlayer->m_type = Player::COMPUTER;
-        }
-
-        if (m_opponentPlayer->m_type == Player::COMPUTER)
-        {
             m_opponentPlayer->m_type = Player::HUMAN;
         }
-        else if (m_opponentPlayer->m_type == Player::HUMAN)
-        {
-            m_opponentPlayer->m_type = Player::COMPUTER;
-        }
-
 
         //dummyPlayer = &m_currentPlayer;
         //m_currentPlayer = &m_opponentPlayer;
@@ -373,20 +364,14 @@ void GameEngine::togglePlayer()
         if (m_currentPlayer->m_type == Player::COMPUTER)
         {
             m_currentPlayer->m_type = Player::HUMAN;
+            m_opponentPlayer->m_type = Player::COMPUTER;
         }
         else if (m_currentPlayer->m_type == Player::HUMAN)
         {
             m_currentPlayer->m_type = Player::COMPUTER;
-        }
-
-        if (m_opponentPlayer->m_type == Player::COMPUTER)
-        {
             m_opponentPlayer->m_type = Player::HUMAN;
         }
-        else if (m_opponentPlayer->m_type == Player::HUMAN)
-        {
-            m_opponentPlayer->m_type = Player::COMPUTER;
-        }
+
 
         qDebug() << "WHITE GameEngine::togglePlayer after" << "m_currentPlayer" << m_currentPlayer;
         qDebug() << "WHITE GameEngine::togglePlayer after" << "m_opponentPlayer" << m_currentPlayer;

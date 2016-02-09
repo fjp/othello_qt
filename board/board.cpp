@@ -191,7 +191,7 @@ QVector<Board *> Board::makeLegalMoves()
     // get possible moves (squares)
     getLegalMoves(NULL);
 
-    // foreach possible move in m_legalMoves list append the future board to QVector.
+    // foreach possible move in m_legalMoves list, append the future board to QVector.
     foreach (Square *square, *m_legalMoves)
     {
         Board *tempBoard = new Board(*this);
@@ -275,6 +275,13 @@ void Board::makeMove(int x, int y)
 
         }
     }
+
+    //m_boardStack<Board*
+}
+
+bool Board::undoMove()
+{
+
 }
 
 bool Board::onBoard(int x, int y)

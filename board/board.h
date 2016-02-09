@@ -69,6 +69,12 @@ public:
     //bool findLegalMoves(bool *legalMoves);
 
     /**
+     * @brief undoMove get the last board from the board stack.
+     * @return true if undo was possible.
+     */
+    bool undoMove();
+
+    /**
      * @brief onBoard checks if a position is on the board
      * @param x
      * @param y
