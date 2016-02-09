@@ -1,23 +1,49 @@
 #include "board.h"
 
 Board::Board(Player *currentPlayer, QObject *parent) : QObject(parent),
-  m_boardMatrix(BOARD_SIZE, QVector<Square* >(BOARD_SIZE))
+    m_boardMatrix(BOARD_SIZE, QVector<Square* >(BOARD_SIZE))
+
 {
+    m_boardStack = new QVector<Board *>(0); // init play history with 64 boards
     m_currentPlayer = currentPlayer;
     newBoard();
 }
 
 Board::Board(const Board &board)
 {
-    m_legalMoves = new QVector<Square* >;
+    m_currentPlayer = new Player(0, board.m_currentPlayer->m_color);
+    m_currentPlayer->m_type = board.m_currentPlayer->m_type;
 
-    // copy the board
+    //m_legalMoves = board.m_legalMoves;
+
+    // same board stack for whole game.
+    m_boardStack = board.m_boardStack;
+
+
+    m_numberOfActualMoves = board.m_numberOfActualMoves;
+    m_numberOfTotalMoves = board.m_numberOfTotalMoves;
+
+    for (int x = 0; x < BOARD_SIZE; x++)
+    {
+        m_boardMatrix.resize(8);
+        for (int y = 0; y < BOARD_SIZE; y++)
+        {
+            m_boardMatrix[x].resize(8);
+        }
+    }
+
+    //m_boardMatrix = board.m_boardMatrix;
+
+    // copy the board matrix
     for (int x = 0; x < BOARD_SIZE; x++)
     {
         for (int y = 0; y < BOARD_SIZE; y++)
         {
-
-            m_boardMatrix[x][y] = board.getSquare(x,y);
+            Square tempSquare = *(board.getSquare(x, y));
+            Square *square = new Square(tempSquare.m_x, tempSquare.m_y);
+            square->setOwner(tempSquare.getOwner());
+            square->setSquareState(tempSquare.getSquareState());
+            m_boardMatrix[x][y] = square;
         }
     }
 
@@ -36,6 +62,9 @@ Square::State Board::getSquareState(int x, int y)
 
 void Board::newBoard()
 {
+    m_numberOfActualMoves = 0;
+    m_numberOfTotalMoves = 0;
+
     m_legalMoves = new QVector<Square* >;
 
     for (int x = 0; x < BOARD_SIZE; x++)
@@ -57,6 +86,15 @@ void Board::newBoard()
     m_numberOfDisks = 4;
 
     m_gameOver = false;
+
+    storeBoardOnStack();
+}
+
+void Board::storeBoardOnStack()
+{
+    Board *boardToStore = new Board(*this);
+    m_boardStack->append(boardToStore);
+    qDebug() << "boardStack size is" << m_boardStack->size();
 }
 
 void Board::countDisks(void)
@@ -276,11 +314,31 @@ void Board::makeMove(int x, int y)
         }
     }
 
-    //m_boardStack<Board*
+    m_numberOfActualMoves++;
+    m_numberOfTotalMoves++;
+
+    storeBoardOnStack();
+
 }
 
 bool Board::undoMove()
 {
+    qDebug() << "Called undoMove";
+    if (m_numberOfActualMoves > 0)
+    {
+        Board *prevBoard = m_boardStack->takeAt(m_numberOfActualMoves - 1);
+        for(int x = 0; x < BOARD_SIZE; x++)
+        {
+            for(int y = 0; y < BOARD_SIZE; y++)
+            {
+                m_boardMatrix[x][y] = prevBoard->m_boardMatrix[x][y];
+            }
+        }
+        m_currentPlayer = prevBoard->m_currentPlayer;
+        m_gameOver = prevBoard->m_gameOver;
+        m_numberOfActualMoves--;
+        m_numberOfTotalMoves--;
+    }
 
 }
 

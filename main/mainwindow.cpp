@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
-    ui(new Ui::MainWindow), m_iBoardSize(8) // TODO where is BoardSize actually used?
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->lineEditTimeLimit->setValidator(new QDoubleValidator(0, 100, 2, this));
 
     connect(ui->pushButtonNewGame, SIGNAL(released()), this, SLOT(startNewGame()));
+
 }
 
 MainWindow::~MainWindow()
@@ -35,12 +36,14 @@ void MainWindow::startNewGame()
 {
     qDebug() << "Starting New Game!";
     //qDebug() << m_iMapSize;
-    m_uiGameScene = new UIGameScene(this, m_iBoardSize, m_iBoardSize);
+    m_uiGameScene = new UIGameScene(this);
     ui->graphicsViewBoard->setScene(m_uiGameScene);
 
     // create new GameLogic here to avoid swalloing KeyBoard Input
     m_gameEngine = new GameEngine(this, m_uiGameScene, ui->textEditEvents, ui->textEditInfo);
     connect(m_uiGameScene, SIGNAL(newMouseEvent(QPointF)), m_gameEngine, SLOT(mouseReleased(QPointF)));
+
+
     //ui->graphicsViewBoard->setScene(m_uiGameScene);
 
     // TODO let palyer choose color.
@@ -51,4 +54,5 @@ void MainWindow::startNewGame()
     double timeLimit = ui->lineEditTimeLimit->text().toDouble();
 
     m_gameEngine->startGame(numberOfHumanPlayers, timeLimit);
+    connect(ui->pushButtonUndo, SIGNAL(released()), m_gameEngine->m_board, SLOT(undoMove()));
 }

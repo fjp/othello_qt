@@ -1,6 +1,6 @@
 #include "uisquare.h"
 
-UISquare::UISquare(int x, int y, State state, Player::Color currentOwner)
+UISquare::UISquare(int x, int y, Square::State state, Player::Color currentOwner)
 {
     m_x = x;
     m_y = y;
@@ -12,7 +12,7 @@ UISquare::UISquare(int x, int y, State state, Player::Color currentOwner)
 UISquare::UISquare(const UISquare &square)
 {
     m_state = square.getState();
-    setSize(50,50);
+    setSize(50);
     initSquare();
 }
 
@@ -24,9 +24,9 @@ UISquare::~UISquare()
 void UISquare::initSquare()
 {
     m_margin = 5;
-    m_ellipse = new QRectF(m_margin, m_margin, m_diskWidth, m_diskHeight);
+    m_ellipse = new QRectF(m_margin, m_margin, m_diskSize, m_diskSize);
     setPosition(0, 0);
-    setState(BOARD);
+    setState(Square::BOARD);
 }
 
 void UISquare::setSquareSize()
@@ -36,7 +36,7 @@ void UISquare::setSquareSize()
 
 QRectF UISquare::boundingRect() const
 {
-    return QRectF(0, 0, m_squareWidth, m_squareHeight);
+    return QRectF(0, 0, m_squareSize, m_squareSize);
 }
 
 void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -48,7 +48,7 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     switch(m_state)
     {
-        case ALLOWED:
+        case Square::ALLOWED:
             pen.setColor(Qt::black);
             brush.setColor(Qt::darkGreen);
             painter->setPen(pen);
@@ -60,9 +60,9 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             brush.setColor(Qt::gray);
             painter->setPen(pen);
             painter->setBrush(brush);
-            painter->drawEllipse(m_margin*4, m_margin*4, m_diskWidth/2, m_diskHeight/2);
+            painter->drawEllipse(m_margin*4, m_margin*4, m_diskSize/2, m_diskSize/2);
             break;
-        case BLACK:
+        case Square::BLACK:
             pen.setColor(Qt::black);
             brush.setColor(Qt::darkGreen);
             painter->setPen(pen);
@@ -72,10 +72,10 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             // draw black disk
             brush.setColor(Qt::black);
             painter->setBrush(brush);
-            painter->drawEllipse(m_margin, m_margin, m_diskWidth, m_diskHeight);
+            painter->drawEllipse(m_margin, m_margin, m_diskSize, m_diskSize);
             break;
 
-        case WHITE:
+        case Square::WHITE:
             pen.setColor(Qt::black);
             brush.setColor(Qt::darkGreen);
             painter->setPen(pen);
@@ -87,10 +87,10 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             brush.setColor(Qt::white);
             painter->setBrush(brush);
             painter->setPen(pen);
-            painter->drawEllipse(m_margin, m_margin, m_diskWidth, m_diskHeight);
+            painter->drawEllipse(m_margin, m_margin, m_diskSize, m_diskSize);
             break;
 
-        case BOARD:
+        case Square::BOARD:
             pen.setColor(Qt::black);
             brush.setColor(Qt::darkGreen);
             painter->setPen(pen);
@@ -136,21 +136,21 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 }
 
-void UISquare::setState(const UISquare::State state)
+void UISquare::setState(const Square::State state)
 {
     m_state = state;
 
     switch (m_state) {
-    case UISquare::ALLOWED:
+    case Square::ALLOWED:
         m_currentOwner = Player::NONE;
         break;
-    case UISquare::BLACK:
+    case Square::BLACK:
         m_currentOwner = Player::BLACK;
         break;
-    case UISquare::WHITE:
+    case Square::WHITE:
         m_currentOwner = Player::WHITE;
         break;
-    case UISquare::NONE:
+    case Square::NONE:
         m_currentOwner = Player::NONE;
         break;
     default:
@@ -161,7 +161,7 @@ void UISquare::setState(const UISquare::State state)
     update();
 }
 
-UISquare::State UISquare::getState() const
+Square::State UISquare::getState() const
 {
     return m_state;
 }
@@ -173,11 +173,9 @@ void UISquare::setPosition(const double boardPositionX, const double boardPositi
     setPos(mapToParent(m_boardPositionX, m_boardPositionY));
 }
 
-void UISquare::setSize(const double height, const double width)
+void UISquare::setSize(const double size)
 {
-    m_squareWidth = width;
-    m_squareHeight = height;
-    m_diskWidth = width - 2*m_margin;
-    m_diskHeight = width - 2*m_margin;
+    m_squareSize = size;
+    m_diskSize = size - 2*m_margin;
     update();
 }

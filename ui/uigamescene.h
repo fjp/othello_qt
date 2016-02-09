@@ -8,24 +8,20 @@
 #include <QGraphicsSceneMouseEvent>
 
 #include "uisquare.h"
+#include "board/board.h"
 
 class UIGameScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
     UIGameScene(QObject * parent);
-    // TODO: we need only one size variable -> int boardSize
-    UIGameScene(QObject * parent, int numberColumns, int numberRows);
     ~UIGameScene();
 
-    void setSquareState(int x, int y, UISquare::State state);
-
-    int m_numberColumns;
-    int m_numberRows;
+    void setSquareState(int x, int y, Square::State state);
+    void redrawBoard(Board *board);
 
     double m_sizeSceneRect;
-    double m_squareWidth;
-    double m_squareHeight;
+    double m_squareSize;
 
 signals:
     /**

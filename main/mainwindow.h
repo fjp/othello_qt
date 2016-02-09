@@ -28,9 +28,6 @@ public slots:
 private:
     Ui::MainWindow *ui;
 
-    QSize m_boardSize;
-    int m_iBoardSize;
-
     GameEngine *m_gameEngine;
     UIGameScene *m_uiGameScene;
     Board *m_board;

@@ -25,6 +25,8 @@ public:
 
     void newBoard();
 
+    void  storeBoardOnStack();
+
     void setPlayers();
 
     /**
@@ -68,11 +70,7 @@ public:
     void makeMove(int x, int y);
     //bool findLegalMoves(bool *legalMoves);
 
-    /**
-     * @brief undoMove get the last board from the board stack.
-     * @return true if undo was possible.
-     */
-    bool undoMove();
+
 
     /**
      * @brief onBoard checks if a position is on the board
@@ -90,6 +88,10 @@ public:
     Player::Color getOtherPlayer(Player *currentPlayer);
 
 
+    QVector<Board* > *m_boardStack;
+
+    int m_numberOfActualMoves;
+    int m_numberOfTotalMoves;
 
 
 private:
@@ -101,6 +103,11 @@ signals:
     void signalBoardChanged(int x, int y, Player::Color color);
 
 public slots:
+    /**
+     * @brief undoMove get the last board from the board stack.
+     * @return true if undo was possible.
+     */
+    bool undoMove();
 };
 
 #endif // BOARD_H

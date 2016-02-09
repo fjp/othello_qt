@@ -6,19 +6,18 @@
 #include <QGraphicsItem>
 
 #include "player/player.h"
+#include "board/square.h"
 
 class UISquare : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 public:
-    enum State {NONE, BOARD, BLACK, WHITE, ALLOWED, SUGGESTED};
-
     /**
      * @brief UISquare main constructor. Position on the board is used for debugging.
      * @param x
      * @param y
      */
-    UISquare(int x, int y, State state = NONE, Player::Color currentOwner = Player::NONE);
+    UISquare(int x, int y, Square::State state = Square::NONE, Player::Color currentOwner = Player::NONE);
     UISquare(const double height, const double width);
 
     // Edit Copy Constructor
@@ -34,10 +33,10 @@ public:
      *
      * @param state
      */
-    void setState(const State state);
-    State getState() const;
+    void setState(const Square::State state);
+    Square::State getState() const;
     void setPosition(const double boardPositionX, const double boardPositionY);
-    void setSize(const double height, const double width);
+    void setSize(const double size);
 
 public slots:
 
@@ -47,7 +46,7 @@ private:
     void setSquareSize();
     void setDiskSize();
 
-    State m_state;
+    Square::State m_state;
 
     double m_boardPositionX;
     double m_boardPositionY;
@@ -57,11 +56,9 @@ private:
 
     Player::Color m_currentOwner;
 
-    double m_squareHeight;
-    double m_squareWidth;
+    double m_squareSize;
 
-    double m_diskHeight;
-    double m_diskWidth;
+    double m_diskSize;
     double m_margin;
 
     QRectF *m_ellipse;

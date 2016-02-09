@@ -6,11 +6,22 @@ GameEngine::GameEngine(QObject *parent, UIGameScene *uiGameScene, QTextEdit *eve
     m_eventList = eventList;
     m_infoList = infoList;
 
-    m_legalMoves = new QVector<Square* >;
+    m_legalMoves = new QVector<Square* >(1);
 }
 
 GameEngine::~GameEngine()
 {
+    if (m_board != NULL)
+        delete m_board;
+    if (m_legalMoves != NULL)
+        delete m_legalMoves;
+    if (m_ai != NULL)
+        delete m_ai;
+
+    if (m_playerB != NULL)
+        delete m_playerB;
+    if (m_playerW != NULL)
+        delete m_playerW;
 
 }
 
@@ -22,15 +33,14 @@ void GameEngine::startGame(int numberOfHumans, double timeLimit)
     m_timeLimit = timeLimit;
 
     // TODO use these variables...
-    m_numberOfActualMoves = 0;
     m_numberOfTotalMoves = 0;
     m_elapsedTime = 0;
 
     m_gameOver = false;
 
-    m_board = new Board(m_currentPlayer);
+    m_board = new Board(m_currentPlayer, this);
 
-    connect(m_board, SIGNAL(signalBoardChanged(int,int,Player::Color)), this, SLOT(updateUI(int,int,Player::Color)));
+    connect(m_board, SIGNAL(signalBoardChanged(int,int,Player::Color)), this, SLOT(updateUISquare(int,int,Player::Color)));
 
     // show infos like whos turn it is and the time needed so far (TODO is this really needed?!).
     updateInfoText("Current Player");
@@ -64,30 +74,34 @@ void GameEngine::mouseReleased(QPointF point)
         qDebug() << "Computer move! Don't click!";
         return;
     }
-    int x = point.x() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberColumns;
-    int y = point.y() / m_uiGameScene->m_sizeSceneRect * m_uiGameScene->m_numberRows;
+    int x = point.x() / m_uiGameScene->m_sizeSceneRect * BOARD_SIZE;
+    int y = point.y() / m_uiGameScene->m_sizeSceneRect * BOARD_SIZE;
     // TODO comment all qDebug()s
     //qDebug() << "Mouse pointer is at" << point << "x" << x << "y" << y;
     eventHandling(x, y);
+}
+
+void GameEngine::updateUIGameScene()
+{
+    m_uiGameScene->redrawBoard(m_board);
 }
 
 void GameEngine::createPlayers(int numberOfHumans)
 {
     if (numberOfHumans == 2)
     {
-        m_humanPlayerB = new HumanPlayer(Player::BLACK);
-        m_humanPlayerW = new HumanPlayer(Player::WHITE);
-        m_currentPlayer = m_humanPlayerB;
-        m_opponentPlayer = m_humanPlayerW;
+        m_playerB = new Player(this, Player::BLACK, Player::HUMAN);
+        m_playerW = new Player(this, Player::WHITE, Player::HUMAN);
     }
     else if (numberOfHumans == 1)
     {
         // TODO let palyer choose color
-        m_computerPlayerB = new ComputerPlayer(Player::BLACK);
-        m_humanPlayerW = new HumanPlayer(Player::WHITE);
-        m_currentPlayer = m_computerPlayerB;
-        m_opponentPlayer = m_humanPlayerW;
+        m_playerB = new Player(this, Player::BLACK, Player::COMPUTER);
+        m_playerW = new Player(this, Player::WHITE, Player::HUMAN);
     }
+
+    m_currentPlayer = m_playerB;
+    m_opponentPlayer = m_playerW;
 
     // TODO set players correctly according to parameter numberOfHumans
 }
@@ -179,9 +193,7 @@ void GameEngine::eventHandling(int x, int y)
             m_board->makeMove(x, y);
             revertAllowedUISquares(x, y);
             //updateUI(x, y, Player::BLACK);
-            m_numberOfActualMoves++;
-            m_numberOfTotalMoves++;
-            eventString = QString(QString::number(m_numberOfActualMoves) + ". Black played at (" +
+            eventString = QString(QString::number(m_board->m_numberOfActualMoves) + ". Black played at (" +
                                   QString::number(x) + "," + QString::number(y) +
                                   ") in " + QString::number(getThinkingTime()) + " sec");
 
@@ -200,9 +212,7 @@ void GameEngine::eventHandling(int x, int y)
             m_board->makeMove(x, y);
             revertAllowedUISquares(x, y);
             //updateUI(x, y, Player::WHITE);
-            m_numberOfActualMoves++;
-            m_numberOfTotalMoves++;
-            eventString = QString(QString::number(m_numberOfActualMoves) + ". White played at (" +
+            eventString = QString(QString::number(m_board->m_numberOfActualMoves) + ". White played at (" +
                                   QString::number(x) + "," + QString::number(y) +
                                   ") in " + QString::number(getThinkingTime()) + " sec");
 
@@ -245,9 +255,7 @@ void GameEngine::eventHandling(int x, int y)
         {
             revertAllowedUISquares(square->m_x, square->m_y);
             //updateUI(square->m_x, square->m_y, Player::BLACK); // UPDATE UI?????
-            m_numberOfActualMoves++;
-            m_numberOfTotalMoves++;
-            eventString = QString(QString::number(m_numberOfActualMoves) + ". Computer played at (" +
+            eventString = QString(QString::number(m_board->m_numberOfActualMoves) + ". Computer played at (" +
                                 QString::number(square->m_x) + "," + QString::number(square->m_y) +
                                 ") in " + QString::number(getThinkingTime()) + " sec");
             togglePlayer();
@@ -270,20 +278,21 @@ void GameEngine::eventHandling(int x, int y)
     updateEventText(eventString);
 }
 
-void GameEngine::updateUI(int x, int y, Player::Color currentPlayer)
+void GameEngine::updateUISquare(int x, int y, Player::Color currentPlayer)
 {
     // update chosen square with player color
     switch (currentPlayer) {
     case Player::BLACK:
-        m_uiGameScene->setSquareState(x, y, UISquare::BLACK);
+        m_uiGameScene->setSquareState(x, y, Square::BLACK);
         break;
     case Player::WHITE:
-        m_uiGameScene->setSquareState(x, y, UISquare::WHITE);
+        m_uiGameScene->setSquareState(x, y, Square::WHITE);
         break;
     case Player::NONE:
-        m_uiGameScene->setSquareState(x, y, UISquare::BOARD);
+        m_uiGameScene->setSquareState(x, y, Square::BOARD);
         break;
     default:
+        m_uiGameScene->setSquareState(x, y, Square::NONE);
         break;
     }
 }
@@ -310,6 +319,8 @@ void GameEngine::updateInfoText(QString string)
 
 void GameEngine::updateEventText(QString string)
 {
+    qDebug() << "NumberOfActualMoves" << m_board->m_numberOfActualMoves;
+    qDebug() << "NumberOfTotalMoves" << m_board->m_numberOfTotalMoves;
     m_eventList->append(string);
 }
 
@@ -326,7 +337,7 @@ void GameEngine::togglePlayer()
     // TODO comment or delet; just for debugging
     m_board->countDisks();
 
-    Player **dummyPlayer;
+    Player *dummyPlayer;
 
     // TODO swap pointers?????????? this is #?!
     switch(m_currentPlayer->m_color)
@@ -398,7 +409,7 @@ void GameEngine::showLegalMoves()
     if (legalMovesAvailable == true)
     {
         foreach (Square *square, *m_legalMoves) {
-            m_uiGameScene->setSquareState(square->m_x, square->m_y, UISquare::ALLOWED);
+            m_uiGameScene->setSquareState(square->m_x, square->m_y, Square::ALLOWED);
         }
     }
 }
@@ -410,11 +421,6 @@ void GameEngine::revertAllowedUISquares(int x, int y)
     m_legalMoves->removeOne(movedSquare);
     foreach (Square *square, *m_legalMoves)
     {
-        updateUI(square->m_x, square->m_y, Player::NONE);
+        updateUISquare(square->m_x, square->m_y, Player::NONE);
     }
-}
-
-void GameEngine::counter()
-{
-
 }

@@ -17,8 +17,6 @@ SOURCES += main/main.cpp\
         board/board.cpp \
         board/square.cpp \
         player/player.cpp \
-        player/humanplayer.cpp \
-        player/computerplayer.cpp \
         ai.cpp \
         referee.cpp \
         ui/uisquare.cpp \
@@ -29,8 +27,6 @@ HEADERS  += main/mainwindow.h \
         board/board.h \
         board/square.h \
         player/player.h \
-        player/humanplayer.h \
-        player/computerplayer.h \
         ai.h \
         referee.h \
         ui/uisquare.h \

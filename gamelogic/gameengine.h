@@ -11,8 +11,6 @@
 
 #include "board/board.h"
 #include "player/player.h"
-#include "player/computerplayer.h"
-#include "player/humanplayer.h"
 #include "ui/uigamescene.h"
 #include "ai.h"
 
@@ -23,15 +21,14 @@ public:
     GameEngine(QObject* parent, UIGameScene* uiGameScene, QTextEdit *eventList, QTextEdit *infoList);
     ~GameEngine();
 
-    void registerHumanPlayer(HumanPlayer player);
-
     void startGame(int numberOfHumans = 1, double timeLimit = 10);
 
     Board *m_board;
     
 public slots:
     void mouseReleased(QPointF point);
-    void updateUI(int x, int y, Player::Color currentPlayer);
+    void updateUISquare(int x, int y, Player::Color currentPlayer);
+    void updateUIGameScene();
 
 private:
     /**
@@ -108,7 +105,7 @@ private:
     /**
      * @brief numberOfActualMoves number of actual moves without passes.
      */
-    int m_numberOfActualMoves;
+    // TODO move comment to boardint m_numberOfActualMoves;
 
     /**
      * @brief numberOfTotalMoves number of total moves including passes.
@@ -131,6 +128,8 @@ private:
      */
     double getThinkingTime();
 
+    Player *m_playerB;
+    Player *m_playerW;
     Player *m_currentPlayer;
     Player *m_opponentPlayer;
 
@@ -139,30 +138,12 @@ private:
      */
     QElapsedTimer m_thinkingTime;
 
-    /**
-     * @brief m_humanPlayerB is used to store black human player.
-     */
-    HumanPlayer* m_humanPlayerB;
-
-    /**
-     * @brief m_humanPlayerW is used to store white human player.
-     */
-    HumanPlayer* m_humanPlayerW;
-
-    /**
-     * @brief m_computerPlayerB
-     */
-    ComputerPlayer* m_computerPlayerB;
-    ComputerPlayer* m_computerPlayerW;
-    QList<Player *> players;
-
 
     AI *m_ai;
 
 
 private slots:
-    // TODO needed?
-    void counter();
+
 };
 
 #endif // GAMEENGINE_H

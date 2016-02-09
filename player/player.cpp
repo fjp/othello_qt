@@ -1,22 +1,7 @@
 #include "player.h"
 
-Player::Player(QObject *parent, Color color) : QObject(parent)
+Player::Player(QObject *parent, Color color, Type type) : QObject(parent)
 {
     m_color = color;
     m_type = UNKNOWN;
 }
-
-void Player::setPlayerColor(Player::Color color)
-{
-    m_color = color;
-}
-
-void Player::setPlayerType(Player::Type type)
-{
-    m_type = type;
-}
-
-//Player::Type Player::getPlayerType()
-//{
-//     return Type::UNKNOWN;
-//}
