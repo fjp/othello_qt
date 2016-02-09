@@ -11,7 +11,15 @@ Square* AI::makeMove(Board *currentBoard)
 
     currentBoard->getLegalMoves(legalMoves);
 
-    Square *square = legalMoves->first();
+    Square *square;
+    if (!legalMoves->isEmpty())
+    {
+        square  = legalMoves->first();
+    }
+    else
+    {
+        square = NULL;
+    }
     currentBoard->makeMove(square->m_x, square->m_y);
 
     return square;

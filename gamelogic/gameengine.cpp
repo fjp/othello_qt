@@ -177,7 +177,7 @@ void GameEngine::eventHandling(int x, int y)
         {
             m_board->makeMove(x, y);
             revertAllowedUISquares(x, y);
-            updateUI(x, y, Player::BLACK);
+            //updateUI(x, y, Player::BLACK);
             m_numberOfActualMoves++;
             m_numberOfTotalMoves++;
             eventString = QString(QString::number(m_numberOfActualMoves) + ". Black played at (" +
@@ -198,7 +198,7 @@ void GameEngine::eventHandling(int x, int y)
         {
             m_board->makeMove(x, y);
             revertAllowedUISquares(x, y);
-            updateUI(x, y, Player::WHITE);
+            //updateUI(x, y, Player::WHITE);
             m_numberOfActualMoves++;
             m_numberOfTotalMoves++;
             eventString = QString(QString::number(m_numberOfActualMoves) + ". White played at (" +
@@ -230,11 +230,45 @@ void GameEngine::eventHandling(int x, int y)
         gameOver();
     }
 
+
     updateEventText(eventString);
 
     // restart the stopwatch
     m_elapsedTime = 0;
     m_thinkingTime.start();
+
+
+    // make a new computer move if it is his turn.
+    if (!gameOver() && m_numberOfHumans == 1 && m_currentPlayer->m_type == Player::COMPUTER)
+    {
+        Square* square = m_ai->makeMove(m_board);
+        if (square != NULL)
+        {
+            revertAllowedUISquares(square->m_x, square->m_y);
+            //updateUI(square->m_x, square->m_y, Player::BLACK); // UPDATE UI?????
+            m_numberOfActualMoves++;
+            m_numberOfTotalMoves++;
+            eventString = QString(QString::number(m_numberOfActualMoves) + ". Computer played at (" +
+                                QString::number(square->m_x) + "," + QString::number(square->m_y) +
+                                ") in " + QString::number(getThinkingTime()) + " sec");
+            togglePlayer();
+        }
+        else // there was no legal move possible because legalMoves list is empty -> see m_ai->makeMove
+        {
+            makePass();
+        }
+
+        bool movesAvailable = m_board->getLegalMoves(m_legalMoves);
+        if (!movesAvailable)
+        {
+            gameOver();
+        }
+
+        // restart the stopwatch
+        m_elapsedTime = 0;
+        m_thinkingTime.start();
+    }
+    updateEventText(eventString);
 }
 
 void GameEngine::updateUI(int x, int y, Player::Color currentPlayer)
@@ -367,14 +401,6 @@ void GameEngine::togglePlayer()
     //qDebug() << "GameEngine::nextPlayer" << m_currentPlayer->m_color;
 
     showLegalMoves();
-
-    // make a new computer move if it is his turn.
-    if (m_numberOfHumans == 1 && m_currentPlayer->m_type == Player::COMPUTER)
-    {
-        Square* square = m_ai->makeMove(m_board);
-        revertAllowedUISquares(square->m_x, square->m_y);
-        togglePlayer();
-    }
 }
 
 void GameEngine::showLegalMoves()
