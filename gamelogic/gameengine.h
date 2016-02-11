@@ -45,6 +45,9 @@ private:
 
 
     void eventHandling(int x, int y);
+
+    void makeComputerMove();
+
     /**
      * @brief togglePlayer
      */
@@ -60,26 +63,12 @@ private:
      */
     //void makeMove(int x, int y); TODO moved to board -> copy comment.
 
-    /**
-     * @brief showLegalMoves is used when players toggle to update UI to display allowed moves.
-     */
-    void showLegalMoves(void);
-
     QVector<QPoint> m_legalMoves;
 
 
     UIGameScene* m_uiGameScene;
     QTextEdit *m_eventList;
     QTextEdit *m_infoList;
-
-
-    /**
-     * @brief revertAllowedUISquares revert allowed squares to Board state that were NOT picked
-     * by current player
-     * @param x picked square by current player (x position)
-     * @param y picked square by current player (y position)
-     */
-    void revertAllowedUISquares(int x, int y);
 
     /**
      * @brief updateInfoText

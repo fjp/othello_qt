@@ -47,22 +47,19 @@ void GameEngine::startGame(int numberOfHumans, double timeLimit)
     //timer.elapsed() << "milliseconds";
 
     // create the AI
-    m_ai = new AI();
+    m_ai = new AI(m_board);
 
 
-    if (m_numberOfHumans == 1 && m_currentPlayer->m_type == COMPUTER)
+    if (m_numberOfHumans == 1 && m_board->whosTurnType() == COMPUTER)
     {
-        //QPoint move = m_ai->makeMove(m_board);
-        //revertAllowedUISquares(move.x(), move.y());
-        //togglePlayer();
+        makeComputerMove();
     }
 
 }
 
 void GameEngine::mouseReleased(QPointF point)
 {
-    qDebug() << "PlayerType" << m_currentPlayer->m_type;
-    if (m_numberOfHumans == 1 && m_currentPlayer->m_type == COMPUTER)
+    if (m_numberOfHumans == 1 && m_board->whosTurnType() == COMPUTER)
     {
         qDebug() << "Computer move! Don't click!";
         return;
@@ -157,8 +154,6 @@ void GameEngine::eventHandling(int x, int y)
             //togglePlayer();
             updateInfoText("Current Player");
             //qDebug() << "GameEngine::nextPlayer" << m_currentPlayer->m_color;
-
-            showLegalMoves();
         }
         break;
 
@@ -202,31 +197,56 @@ void GameEngine::eventHandling(int x, int y)
     m_thinkingTime.start();
 
     // make a new computer move if it is his turn.
-    //if (!gameOver() && m_numberOfHumans == 1 && m_currentPlayer->m_type == COMPUTER)
-    //{
-        //QPoint move = m_ai->makeMove(m_board);
-        //revertAllowedUISquares(move.x(), move.y());
-        //updateUI(square->m_x, square->m_y, Player::BLACK); // UPDATE UI?????
-        //eventString = QString(QString::number(m_board->m_numberOfActualMoves) + ". Computer played at (" +
-        //                    QString::number(move.x()) + "," + QString::number(move.y()) +
-        //                    ") in " + QString::number(getThinkingTime()) + " sec");
-        //togglePlayer();
-        //updateInfoText("Current Player");
-        //qDebug() << "GameEngine::nextPlayer" << m_currentPlayer->m_color;
+    if (!gameOver() && m_numberOfHumans == 1 && m_board->whosTurnType() == COMPUTER)
+    {
+        makeComputerMove();
+        updateInfoText("Current Player");
+    }
+    updateEventText(eventString);
+}
 
-        //showLegalMoves();
+void GameEngine::makeComputerMove()
+{
+    //m_ai->makeMove();
 
-        //bool movesAvailable = m_board->legalMovesAvailable();
-        //if (!movesAvailable)
-        //{
-        //    gameOver();
-        //}
+    m_ai->m_startingDepth = m_board->m_numberOfActualMoves;
 
-        // restart the stopwatch
-        //m_elapsedTime = 0;
-        //m_thinkingTime.start();
-    //}
-    //updateEventText(eventString);
+    QPair<int,int> savedMove = QPair<int,int>(-10,-10);
+    int evaluation = m_ai->max(m_timeLimit, -INFTY, +INFTY);
+    savedMove = m_ai->savedMove();
+    qDebug() << "Evaluation" << evaluation;
+    if (savedMove.first == -10)
+    {
+        qDebug() << "AI found no more moves";
+        // check if game over when AI cannot find moves.
+        gameOver();
+    }
+
+    else
+    {
+        // execute saved moves
+        qDebug() << "executing saved moves";
+        if (m_board->legalMove(savedMove.first, savedMove.second))
+        {
+            m_board->makeMove(savedMove.first, savedMove.second);
+        }
+        else
+        {
+            qDebug() << "COMPUTER MADE A WRONG MOVE!";
+        }
+    }
+
+    updateInfoText("Current Player");
+
+    bool movesAvailable = m_board->legalMovesAvailable();
+    if (!movesAvailable)
+    {
+        gameOver();
+    }
+
+    // restart the stopwatch
+    m_elapsedTime = 0;
+    m_thinkingTime.start();
 }
 
 void GameEngine::updateUISquare(int x, int y, State currentPlayer)
@@ -292,30 +312,4 @@ void GameEngine::togglePlayer()
     dummyPlayer = m_currentPlayer;
     m_currentPlayer = m_opponentPlayer;
     m_opponentPlayer = dummyPlayer;
-}
-
-void GameEngine::showLegalMoves()
-{
-//    // clear list first (forget previous legal moves)
-//    m_legalMoves.clear();
-
-//    // check if there are legal moves available before actually trying to redraw some.
-//    bool legalMovesAvailable = m_board->legalMovesAvailable();
-//    m_board->getLegalMoves();
-
-//    if (legalMovesAvailable == true)
-//    {
-//        m_uiGameScene->redrawBoard(m_board);
-//    }
-}
-
-void GameEngine::revertAllowedUISquares(int x, int y)
-{
-    // revert allowed squares to Board state that were NOT picked by current player
-    QPoint move = QPoint(x, y);
-    m_legalMoves.removeOne(move);
-    foreach (QPoint move, m_legalMoves)
-    {
-        updateUISquare(move.x(), move.x(), BOARD);
-    }
 }

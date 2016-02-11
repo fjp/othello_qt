@@ -47,6 +47,8 @@ public:
      */
     void countDisks(void);
 
+    int countPlayerDisks(void);
+
     int m_numberOfBlackDisks;
     int m_numberOfWhiteDisks;
     int m_numberOfDisks;
@@ -85,6 +87,8 @@ public:
     //bool findLegalMoves(bool *legalMoves);
 
     State whosTurn();
+
+    Type whosTurnType();
 
 
     /**

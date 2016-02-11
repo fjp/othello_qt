@@ -165,6 +165,25 @@ void Board::countDisks(void)
     }
 }
 
+int Board::countPlayerDisks()
+{
+    countDisks();
+
+    int diskCount;
+
+    if (m_currentPlayer->m_color == BLACK)
+    {
+        diskCount = m_numberOfBlackDisks;
+    }
+    else if (m_currentPlayer->m_color == WHITE)
+    {
+        diskCount = m_numberOfWhiteDisks;
+
+    }
+
+    return diskCount;
+}
+
 bool Board::legalMove(int x, int y)
 {
     qDebug() << "--------------------------- Check new legal Move at -------------------------------";
@@ -225,11 +244,9 @@ bool Board::legalMove(int x, int y)
 
 bool Board::legalMovesAvailable()
 {
-    //m_movesAvailable = (getLegalMoves().isEmpty() == false);
+    m_movesAvailable = (getLegalMoves().isEmpty() == false);
 
-    //return m_movesAvailable;
-    return true;
-
+    return m_movesAvailable;
 }
 
 QMap<QPair<int,int >, QVector<QPair<int,int > > > Board::getLegalMoves()
@@ -366,6 +383,11 @@ void Board::makeMove(int x, int y)
 State Board::whosTurn()
 {
     return m_currentPlayer->m_color;
+}
+
+Type Board::whosTurnType()
+{
+    return m_currentPlayer->m_type;
 }
 
 bool Board::undoMove()

@@ -44,32 +44,41 @@ The squares in the corners of the board are strategic positions that result in g
 when occupied; furthermore, a disc in a corner square can never be flipped. For this reason,
 we have assigned a value of 10 to each corner square,
 and thus one corner square is worth 10 legal moves or 1000 discs.
-
-Brute-Force Evaluation Function
-The brute-force evaluation function is optimal and is used
-whenever we can build the whole game search-tree. The function has two modes of execution.
-One mode tries to maximize the computer’s number of extra discs in a win-condition
-(or alternatively, if the computer cannot win, it tries to minimize the player’s number of extra discs).
-The other mode does not care about how many discs the computer can win by,
-but just whether it can win. The brute-force evaluation function kicks in at the end of the game
-when the board is nearly full (the default cut-off is 14 empty squares left).
 */
+
+#include <QMap>
+#include <QVector>
+#include <QPair>
 
 #include "board/board.h"
 #include "player/player.h"
+#include "define.h"
 
 class AI
 {
 
 public:
-    AI();
+    AI(Board *board);
 
-    //QPoint makeMove(Board currentBoard);
+    void makeRandomMove();
+
+    int max(int depth, int alpha, int beta);
+    int min(int depth, int alpha, int beta);
+
+    QPair<int, int> savedMove();
+
+    int m_startingDepth;
 
 
 private:
+    Board *m_board;
+
     //int alphaBeta(Board board, int depth, int alpha, int beta, bool maximizingPlayer);
-    //int evaluateBoard(Board currentBoard);
+    int evaluateBoard();
+
+    QPair<int, int> m_savedMove;
+
+
 
     //Board m_currentBoard;
 };
