@@ -73,6 +73,8 @@ public:
 private:
     Board *m_board;
 
+    static const int m_heuristic[8][8];
+
     //int alphaBeta(Board board, int depth, int alpha, int beta, bool maximizingPlayer);
     int evaluateBoard();
 

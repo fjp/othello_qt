@@ -208,6 +208,8 @@ void GameEngine::makeComputerMove()
 {
     //m_ai->makeRandomMove();
 
+    gameOver();
+
     m_ai->m_startingDepth = m_timeLimit;
 
     QPair<int,int> savedMove = QPair<int,int>(-10,-10);

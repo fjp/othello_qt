@@ -21,7 +21,6 @@ public:
     Board(QObject *parent = 0, int numberOfHumans = 2);
     Board(const Board &board);
 
-    // TODO move intitialization to constructor
     static const int m_direction[8][2];
 
     State getState(int x, int y) const;
@@ -47,6 +46,13 @@ public:
      */
     void countDisks(void);
 
+
+
+    /**
+     * @brief countPlayerDisks counts the disk of the current player of the board.
+     * This function is used for the evaluation function inside the AI class.
+     * @return
+     */
     int countPlayerDisks(void);
 
     int m_numberOfBlackDisks;
@@ -72,8 +78,6 @@ public:
 
     QMap<QPair<int,int>, QVector<QPair<int,int > > > m_flipped;
 
-    //QMap<QPair<int,int>, QVector<QPair<int,int> > > m_legalMoves;
-
     bool m_movesAvailable;
 
     QVector<Board *> makeLegalMoves();
@@ -84,15 +88,22 @@ public:
      * @param y
      */
     void makeMove(int x, int y);
-    //bool findLegalMoves(bool *legalMoves);
 
+    /**
+     * @brief whosTurn returns the color of the current player stored in m_currentPlayer.
+     * @return
+     */
     State whosTurn();
 
+    /**
+     * @brief whosTurnType returns the type of the current player stored in m_currentPlayer.
+     * @return
+     */
     Type whosTurnType();
 
 
     /**
-     * @brief onBoard checks if a position is on the board
+     * @brief onBoard checks if a position or move is on the board
      * @param x
      * @param y
      * @return
@@ -100,13 +111,17 @@ public:
     bool onBoard(int x, int y);
 
     /**
-     * @brief getOtherPlayer get the color of opponent
-     * @param currentPlayer
+     * @brief getOtherPlayer used to get the color of the opponent
+     * @param player
      * @return
      */
-    State getOtherPlayer(Player *currentPlayer);
+    State getOtherPlayer(Player *player);
 
 
+    /**
+     * @brief m_boardStack stores the boards according to the made moves.
+     * Mainly used for the AI to unwind the recursion.
+     */
     QStack<Board* > *m_boardStack;
 
     int m_numberOfActualMoves;

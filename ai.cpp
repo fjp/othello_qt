@@ -1,5 +1,15 @@
 #include "ai.h"
 
+const int AI::m_heuristic[8][8] = {   { 100,   50,  50,  50,  50,  50,   50, 100, }, // 1
+                                      {  50, -100, -30, -30, -30, -30, -100,  50, }, // 2
+                                      {  50,  -50,   0,   0,   0,   0,  -50,  50, }, // 3
+                                      {  50,  -50,   0,   0,   0,   0,  -50,  50, }, // 3
+                                      {  50,  -50,   0,   0,   0,   0,  -50,  50, }, // 3
+                                      {  50,  -50,   0,   0,   0,   0,  -50,  50, }, // 3
+                                      {  50, -100, -50, -50, -50, -50, -100,  50, }, // 3
+                                      { 100,   50,  50,  50,  50,  50,   50, 100, }, // 3
+                                  };
+
 
 AI::AI(Board *board)
 {
@@ -102,11 +112,6 @@ int AI::min(int depth, int alpha, int beta)
             {
                 break;
             }
-            if (depth == m_board->m_numberOfActualMoves-1)
-            {
-                // TODO Wrong?!
-                //m_savedMove = move;
-            }
         }
     }
     return minValue;
@@ -127,22 +132,42 @@ int AI::evaluateBoard()
 
     evaluation += legalMovesCount + diskCount;
 
-    // corner count
-    QPair<int, int> tl = QPair<int,int>(0,0);
-    QPair<int, int> bl = QPair<int,int>(0,7);
-    QPair<int, int> tr = QPair<int,int>(7,0);
-    QPair<int, int> br = QPair<int,int>(7,7);
 
+    QPair<int, int> boardPosition;
+    for (int x = 0; x < 8; x++)
+    {
+        for (int y = 0; y < 8; y++)
+        {
+            boardPosition = QPair<int, int>(x,y);
+            if (legalMoves.contains(boardPosition))
+            {
+                evaluation += m_heuristic[x][y];
+            }
 
+        }
+    }
 
-    if (legalMoves.contains(tl))
-        evaluation += 100;
-    if (legalMoves.contains(bl))
-        evaluation += 100;
-    if (legalMoves.contains(tr))
-        evaluation += 100;
-    if (legalMoves.contains(br))
-        evaluation += 100;
+    QPair<int, int> move;
+    QMap<QPair<int,int>, QVector<QPair<int,int> > > legalOpponentMoves;
+    foreach (move, legalMoves.keys())
+    {
+        m_board->makeMove(move.first,move.second);
+        legalOpponentMoves = m_board->getLegalMoves();
+        QPair<int, int> boardPosition;
+        for (int x = 0; x < 8; x++)
+        {
+            for (int y = 0; y < 8; y++)
+            {
+                boardPosition = QPair<int, int>(x,y);
+                if (legalOpponentMoves.contains(boardPosition))
+                {
+                    // negative sign here because it is opponents turn.
+                    evaluation -= m_heuristic[x][y];
+                }
+            }
+        }
+        m_board->undoMove();
+    }
 
 
 

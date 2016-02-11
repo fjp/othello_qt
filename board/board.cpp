@@ -337,23 +337,19 @@ void Board::makeMove(int x, int y)
     // convert the position into QPair
     QPair<int,int> move = QPair<int, int>(x,y);
 
+    // get all legal moves (key of the QMap) and the corresponding disks that will flipp (stored in QVector)
     QMap<QPair<int,int >, QVector<QPair<int,int > > > legalMoves = getLegalMoves();
+    QVector<QPair<int, int> > flipps = legalMoves.value(move);
 
 
-    //setAllowed(legalMoves);
-    //emit signalBoardChanged();
-
-    QVector<QPair<int, int> > flipped = legalMoves.value(move);
-
-    m_flipped.insert(move, flipped);
-
+    // update every flip with the color of the current player
     QPair<int, int> flip;
-    foreach (flip, flipped)
+    foreach (flip, flipps)
     {
         m_boardMatrix[flip.first][flip.second] = m_currentPlayer->m_color;
     }
 
-    // revert state of previously allowed moves
+    // revert ALLOWED state to BOARD of previously allowed moves (possible moves that were not chosen)
     QPair<int,int> revertMove;
     foreach (revertMove, legalMoves.keys())
     {
@@ -366,8 +362,6 @@ void Board::makeMove(int x, int y)
 
     m_numberOfActualMoves++;
     m_numberOfTotalMoves++;
-
-
 
     togglePlayer();
 
@@ -439,13 +433,13 @@ bool Board::onBoard(int x, int y)
     return false;
 }
 
-State Board::getOtherPlayer(Player *currentPlayer)
+State Board::getOtherPlayer(Player *player)
 {
-    if (currentPlayer->m_color == BLACK)
+    if (player->m_color == BLACK)
     {
         return WHITE;
     }
-    else if (currentPlayer->m_color == WHITE)
+    else if (player->m_color == WHITE)
     {
         return BLACK;
     }

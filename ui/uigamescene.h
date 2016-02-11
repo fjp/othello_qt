@@ -6,6 +6,8 @@
 #include <QtWidgets>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QColor>
+#include <QGraphicsSimpleTextItem>
 
 #include "uisquare.h"
 #include "board/board.h"
@@ -15,6 +17,10 @@ class UIGameScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
+    /**
+     * @brief UIGameScene
+     * @param parent
+     */
     UIGameScene(QObject * parent);
     ~UIGameScene();
 
@@ -60,6 +66,8 @@ private:
      * are updated using the public setSquareState() function.
      */
     QVector< QVector<UISquare *> > m_board;
+
+    QVector< QGraphicsSimpleTextItem *> m_edgeText;
 
 };
 
