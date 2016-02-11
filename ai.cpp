@@ -58,10 +58,10 @@ int AI::max(int depth, int alpha, int beta)
             {
                 break;
             }
-            //if (depth == m_startingDepth)
-            //{
+            if (depth == m_startingDepth)
+            {
                 m_savedMove = move;
-            //}
+            }
 
         }
     }
@@ -114,6 +114,7 @@ int AI::min(int depth, int alpha, int beta)
 
 int AI::evaluateBoard()
 {
+    int evaluation = 0;
     QMap<QPair<int,int>, QVector<QPair<int,int> > > legalMoves = m_board->getLegalMoves();
 
     // legal moves count
@@ -124,9 +125,26 @@ int AI::evaluateBoard()
     int numberOfPlayerDisks = m_board->countPlayerDisks();
     int diskCount = DISCOUNT*numberOfPlayerDisks;
 
-    // todo corner squares...
+    evaluation += legalMovesCount + diskCount;
 
-    int evaluation = legalMovesCount + diskCount;
+    // corner count
+    QPair<int, int> tl = QPair<int,int>(0,0);
+    QPair<int, int> bl = QPair<int,int>(0,7);
+    QPair<int, int> tr = QPair<int,int>(7,0);
+    QPair<int, int> br = QPair<int,int>(7,7);
+
+
+
+    if (legalMoves.contains(tl))
+        evaluation += 100;
+    if (legalMoves.contains(bl))
+        evaluation += 100;
+    if (legalMoves.contains(tr))
+        evaluation += 100;
+    if (legalMoves.contains(br))
+        evaluation += 100;
+
+
 
     return evaluation;
 

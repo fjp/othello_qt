@@ -126,10 +126,10 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         break;
     }
 
-    QString squarePosition = QString("(%1,%2) %3").arg(QString::number(m_x), QString::number(m_y), owner);
-    pen.setColor(Qt::white);
-    painter->setPen(pen);
-    painter->drawText(5, 10, squarePosition);
+    //QString squarePosition = QString("(%1,%2) %3").arg(QString::number(m_x), QString::number(m_y), owner);
+    //pen.setColor(Qt::white);
+    //painter->setPen(pen);
+    //painter->drawText(5, 10, squarePosition);
 
 }
 

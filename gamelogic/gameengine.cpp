@@ -200,16 +200,15 @@ void GameEngine::eventHandling(int x, int y)
     if (!gameOver() && m_numberOfHumans == 1 && m_board->whosTurnType() == COMPUTER)
     {
         makeComputerMove();
-        updateInfoText("Current Player");
+
     }
-    updateEventText(eventString);
 }
 
 void GameEngine::makeComputerMove()
 {
-    //m_ai->makeMove();
+    //m_ai->makeRandomMove();
 
-    m_ai->m_startingDepth = m_board->m_numberOfActualMoves;
+    m_ai->m_startingDepth = m_timeLimit;
 
     QPair<int,int> savedMove = QPair<int,int>(-10,-10);
     int evaluation = m_ai->max(m_timeLimit, -INFTY, +INFTY);
@@ -244,6 +243,12 @@ void GameEngine::makeComputerMove()
         gameOver();
     }
 
+    QString eventString = QString(QString::number(m_board->m_numberOfActualMoves) + ". Computer played at (" +
+                          QString::number(savedMove.first) + "," + QString::number(savedMove.second) +
+                          ") in " + QString::number(getThinkingTime()) + " sec");
+    updateInfoText("Current Player");
+    updateEventText(eventString);
+
     // restart the stopwatch
     m_elapsedTime = 0;
     m_thinkingTime.start();
@@ -270,21 +275,27 @@ void GameEngine::updateUISquare(int x, int y, State currentPlayer)
 
 void GameEngine::updateInfoText(QString string)
 {
-    //m_infoList->setText(string);
-    switch (m_board->whosTurn())
+    if (m_gameOver)
     {
-    case BLACK:
-        m_infoList->setText(QString("Black to move"));
-        break;
-    case WHITE:
-        m_infoList->setText(QString("White to move"));
-        break;
-    case NONE:
-        m_infoList->append(QString("NONE to move?! Debug this"));
-        break;
-    default:
-        m_infoList->append(QString("default case ... Debug this"));
-        break;
+        m_infoList->setText(string);
+    }
+    else
+    {
+        switch (m_board->whosTurn())
+        {
+        case BLACK:
+            m_infoList->setText(QString("Black to move"));
+            break;
+        case WHITE:
+            m_infoList->setText(QString("White to move"));
+            break;
+        case NONE:
+            m_infoList->append(QString("NONE to move?! Debug this"));
+            break;
+        default:
+            m_infoList->append(QString("default case ... Debug this"));
+            break;
+        }
     }
 }
 
