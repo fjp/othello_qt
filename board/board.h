@@ -1,33 +1,45 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-
 #define BOARD_SIZE 8
 
 #include <QObject>
 #include <QDebug>
+#include <QMap>
+#include <QVector>
+#include <QStack>
+#include <QPair>
 
-#include "board/square.h"
 #include "player/player.h"
+
+#include "define.h"
 
 class Board : public QObject
 {
     Q_OBJECT
 public:
-    explicit Board(Player *currentPlayer, QObject *parent = 0);
+    Board(QObject *parent = 0, int numberOfHumans = 2);
     Board(const Board &board);
 
     // TODO move intitialization to constructor
-    const int m_direction[8][2] = {{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}};
+    static const int m_direction[8][2];
 
-    Square *getSquare(int x, int y) const;
-    Square::State getSquareState(int x, int y);
+    State getState(int x, int y) const;
 
-    void newBoard();
+    void setAllowed(QMap<QPair<int,int >, QVector<QPair<int,int > > > legalMoves);
 
-    void  storeBoardOnStack();
+    void newBoard(int numberOfHumans);
+
+    void storeBoardOnStack();
 
     void setPlayers();
+
+    void togglePlayer();
+
+    /**
+     * @brief makePass used if there are no legal moves left for the current player
+     */
+    void makePass();
 
     /**
      * @brief countDisks count number of black, white and total disks
@@ -50,15 +62,17 @@ public:
      */
     bool legalMove(int x, int y);
 
-    /**
-     * @brief getLegalMoves fill the provided QVector legalMoves with Squares
-     * that are allowed to place disks on for the current player.
-     * @param legalMoves
-     * @return
-     */
-    bool getLegalMoves(QVector<Square *> *legalMoves);
+    bool legalMovesAvailable();
 
-    QVector<Square* > *m_legalMoves;
+
+    QMap<QPair<int,int>, QVector<QPair<int,int> > > getLegalMoves();
+    QMap<QPair<int,int >, QVector<QPair<int,int > > > m_prevLegalMoves;
+
+    QMap<QPair<int,int>, QVector<QPair<int,int > > > m_flipped;
+
+    //QMap<QPair<int,int>, QVector<QPair<int,int> > > m_legalMoves;
+
+    bool m_movesAvailable;
 
     QVector<Board *> makeLegalMoves();
 
@@ -70,6 +84,7 @@ public:
     void makeMove(int x, int y);
     //bool findLegalMoves(bool *legalMoves);
 
+    State whosTurn();
 
 
     /**
@@ -85,22 +100,24 @@ public:
      * @param currentPlayer
      * @return
      */
-    Player::Color getOtherPlayer(Player *currentPlayer);
+    State getOtherPlayer(Player *currentPlayer);
 
 
-    QVector<Board* > *m_boardStack;
+    QStack<Board* > *m_boardStack;
 
     int m_numberOfActualMoves;
     int m_numberOfTotalMoves;
 
 
 private:
-    QVector<QVector<Square* > > m_boardMatrix;
+    QVector<QVector<State > > m_boardMatrix;
+    //QMap<QPoint, State> m_boardMatrix;
     Player *m_currentPlayer;
+    Player *m_opponentPlayer;
 
 
 signals:
-    void signalBoardChanged(int x, int y, Player::Color color);
+    void signalBoardChanged();
 
 public slots:
     /**

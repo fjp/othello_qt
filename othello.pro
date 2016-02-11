@@ -15,22 +15,19 @@ TEMPLATE = app
 SOURCES += main/main.cpp\
         main/mainwindow.cpp \
         board/board.cpp \
-        board/square.cpp \
         player/player.cpp \
         ai.cpp \
-        referee.cpp \
         ui/uisquare.cpp \
         ui/uigamescene.cpp \
         gamelogic/gameengine.cpp
 
 HEADERS  += main/mainwindow.h \
         board/board.h \
-        board/square.h \
         player/player.h \
         ai.h \
-        referee.h \
         ui/uisquare.h \
         ui/uigamescene.h \
-        gamelogic/gameengine.h
+        gamelogic/gameengine.h \
+    define.h
 
 FORMS    += main/mainwindow.ui

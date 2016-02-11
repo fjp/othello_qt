@@ -5,8 +5,7 @@
 #include <QObject>
 #include <QGraphicsItem>
 
-#include "player/player.h"
-#include "board/square.h"
+#include "define.h"
 
 class UISquare : public QObject, public QGraphicsItem
 {
@@ -17,7 +16,7 @@ public:
      * @param x
      * @param y
      */
-    UISquare(int x, int y, Square::State state = Square::NONE, Player::Color currentOwner = Player::NONE);
+    UISquare(int x, int y, State state = NONE);
     UISquare(const double height, const double width);
 
     // Edit Copy Constructor
@@ -33,8 +32,8 @@ public:
      *
      * @param state
      */
-    void setState(const Square::State state);
-    Square::State getState() const;
+    void setUISquareState(const State state);
+    State getUISquareState() const;
     void setPosition(const double boardPositionX, const double boardPositionY);
     void setSize(const double size);
 
@@ -46,15 +45,13 @@ private:
     void setSquareSize();
     void setDiskSize();
 
-    Square::State m_state;
+    State m_state;
 
     double m_boardPositionX;
     double m_boardPositionY;
 
     int m_x;
     int m_y;
-
-    Player::Color m_currentOwner;
 
     double m_squareSize;
 

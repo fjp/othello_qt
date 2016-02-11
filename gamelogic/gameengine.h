@@ -27,7 +27,7 @@ public:
     
 public slots:
     void mouseReleased(QPointF point);
-    void updateUISquare(int x, int y, Player::Color currentPlayer);
+    void updateUISquare(int x, int y, State currentPlayer);
     void updateUIGameScene();
 
 private:
@@ -43,13 +43,6 @@ private:
      */
     QString getGameStats(void);
 
-
-    /**
-     * @brief makePass used if there are no legal moves left for the current player
-     */
-    void makePass();
-
-    void createPlayers(int numberOfHumans);
 
     void eventHandling(int x, int y);
     /**
@@ -72,7 +65,7 @@ private:
      */
     void showLegalMoves(void);
 
-    QVector<Square* > *m_legalMoves;
+    QVector<QPoint> m_legalMoves;
 
 
     UIGameScene* m_uiGameScene;
@@ -128,8 +121,6 @@ private:
      */
     double getThinkingTime();
 
-    Player *m_playerB;
-    Player *m_playerW;
     Player *m_currentPlayer;
     Player *m_opponentPlayer;
 

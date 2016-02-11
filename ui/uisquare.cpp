@@ -1,17 +1,16 @@
 #include "uisquare.h"
 
-UISquare::UISquare(int x, int y, Square::State state, Player::Color currentOwner)
+UISquare::UISquare(int x, int y, State state)
 {
     m_x = x;
     m_y = y;
     m_state = state;
-    m_currentOwner = currentOwner;
     initSquare();
 }
 
 UISquare::UISquare(const UISquare &square)
 {
-    m_state = square.getState();
+    m_state = square.getUISquareState();
     setSize(50);
     initSquare();
 }
@@ -26,12 +25,7 @@ void UISquare::initSquare()
     m_margin = 5;
     m_ellipse = new QRectF(m_margin, m_margin, m_diskSize, m_diskSize);
     setPosition(0, 0);
-    setState(Square::BOARD);
-}
-
-void UISquare::setSquareSize()
-{
-
+    setUISquareState(BOARD);
 }
 
 QRectF UISquare::boundingRect() const
@@ -48,7 +42,7 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     switch(m_state)
     {
-        case Square::ALLOWED:
+        case ALLOWED:
             pen.setColor(Qt::black);
             brush.setColor(Qt::darkGreen);
             painter->setPen(pen);
@@ -62,7 +56,7 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             painter->setBrush(brush);
             painter->drawEllipse(m_margin*4, m_margin*4, m_diskSize/2, m_diskSize/2);
             break;
-        case Square::BLACK:
+        case BLACK:
             pen.setColor(Qt::black);
             brush.setColor(Qt::darkGreen);
             painter->setPen(pen);
@@ -75,7 +69,7 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             painter->drawEllipse(m_margin, m_margin, m_diskSize, m_diskSize);
             break;
 
-        case Square::WHITE:
+        case WHITE:
             pen.setColor(Qt::black);
             brush.setColor(Qt::darkGreen);
             painter->setPen(pen);
@@ -90,7 +84,7 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             painter->drawEllipse(m_margin, m_margin, m_diskSize, m_diskSize);
             break;
 
-        case Square::BOARD:
+        case BOARD:
             pen.setColor(Qt::black);
             brush.setColor(Qt::darkGreen);
             painter->setPen(pen);
@@ -110,22 +104,25 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     // TODO comment; used for debugging to see the square positions.
     QString owner;
-    switch (m_currentOwner)
+    switch (m_state)
     {
-    case Player::BLACK:
+    case BLACK:
         owner = QString("BLACK");
         break;
 
-    case Player::WHITE:
+    case WHITE:
         owner = QString("WHITE");
         break;
 
-    case Player::NONE:
+    case BOARD:
+        owner = QString("NONE");
+
+    case NONE:
         owner = QString("NONE");
         break;
 
     default:
-        owner = QString("default");
+        owner = QString("... default");
         break;
     }
 
@@ -136,32 +133,14 @@ void UISquare::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 }
 
-void UISquare::setState(const Square::State state)
+void UISquare::setUISquareState(const State state)
 {
     m_state = state;
-
-    switch (m_state) {
-    case Square::ALLOWED:
-        m_currentOwner = Player::NONE;
-        break;
-    case Square::BLACK:
-        m_currentOwner = Player::BLACK;
-        break;
-    case Square::WHITE:
-        m_currentOwner = Player::WHITE;
-        break;
-    case Square::NONE:
-        m_currentOwner = Player::NONE;
-        break;
-    default:
-        break;
-    }
-
     // commit redraw of changed square -> this updates the GraphicsScene UIGameScene.
     update();
 }
 
-Square::State UISquare::getState() const
+State UISquare::getUISquareState() const
 {
     return m_state;
 }

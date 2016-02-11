@@ -9,6 +9,7 @@
 
 #include "uisquare.h"
 #include "board/board.h"
+#include "define.h"
 
 class UIGameScene : public QGraphicsScene
 {
@@ -17,7 +18,7 @@ public:
     UIGameScene(QObject * parent);
     ~UIGameScene();
 
-    void setSquareState(int x, int y, Square::State state);
+    void setSquareState(int x, int y, State state);
     void redrawBoard(Board *board);
 
     double m_sizeSceneRect;

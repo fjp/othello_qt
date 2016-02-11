@@ -1,0 +1,8 @@
+#ifndef DEFINE_H
+#define DEFINE_H
+
+
+enum Type {UNKNOWN, HUMAN, COMPUTER};
+enum State {NONE, BOARD, BLACK, WHITE, ALLOWED, SUGGESTED};
+
+#endif // DEFINE_H

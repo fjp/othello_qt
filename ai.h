@@ -62,16 +62,16 @@ class AI
 {
 
 public:
-    AI(Board *currentBoard);
+    AI();
 
-    Square *makeMove(Board *currentBoard);
+    //QPoint makeMove(Board currentBoard);
 
 
 private:
-    int alphaBeta(Board *board, int depth, int alpha, int beta, bool maximizingPlayer);
-    int evaluateBoard(Board *currentBoard);
+    //int alphaBeta(Board board, int depth, int alpha, int beta, bool maximizingPlayer);
+    //int evaluateBoard(Board currentBoard);
 
-    Board *m_currentBoard;
+    //Board m_currentBoard;
 };
 
 #endif // AI_H

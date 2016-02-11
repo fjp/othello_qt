@@ -1,32 +1,24 @@
 #include "ai.h"
 
-AI::AI(Board *currentBoard)
+
+AI::AI()
 {
-    m_currentBoard = currentBoard;
+    //m_currentBoard = currentBoard;
 }
 
-Square* AI::makeMove(Board *currentBoard)
-{
-    QVector<Square* > *legalMoves = new QVector<Square* >;
-
-    currentBoard->getLegalMoves(legalMoves);
+//QPoint AI::makeMove(Board currentBoard)
+//{
+//    QVector<QPoint> m_legalMoves = currentBoard.getLegalMoves();
 
 
-
-
-    Square *square;
-    if (!legalMoves->isEmpty())
-    {
-        square  = legalMoves->first();
-    }
-    else
-    {
-        square = NULL;
-    }
-    currentBoard->makeMove(square->m_x, square->m_y);
-
-    return square;
-}
+//    QPoint move;
+//    if (!m_legalMoves.isEmpty())
+//    {
+//         move = m_legalMoves.first();
+//         currentBoard.makeMove(move.x(), move.y());
+//    }
+//    return move;
+//}
 
 
 //int max(Board *board, int depth)
@@ -77,63 +69,62 @@ Square* AI::makeMove(Board *currentBoard)
 
 
 
-int AI::alphaBeta(Board *board, int depth, int alpha, int beta, bool maximizingPlayer)
-{
-    // TODO time parameter ...
-    if (depth = 0 || board->m_gameOver)
-    {
-        int boardValue = evaluateBoard(board);
-        //if (boardValue > maxBoardValue)
+//int AI::alphaBeta(Board board, int depth, int alpha, int beta, bool maximizingPlayer)
+//{
+//    // TODO time parameter ...
+//    if (depth = 0 || board.m_gameOver)
+//    {
+//        int boardValue = evaluateBoard(board);
+//        //if (boardValue > maxBoardValue)
 
-        //return ;
-    }
+//        //return ;
+//    }
 
-    QVector<Board *> possibleBoards = board->makeLegalMoves();
+//    QVector<Board *> possibleBoards = board.makeLegalMoves();
 
-    if (maximizingPlayer == true)
-    {
-        foreach (Board *board, possibleBoards)
-        {
-            int newAlpha = alphaBeta(board, depth-1, alpha, beta, false);
-            if (newAlpha >= alpha)
-            {
-                alpha = newAlpha;
-            }
+//    if (maximizingPlayer == true)
+//    {
+//        foreach (Board *board, possibleBoards)
+//        {
+//            int newAlpha = alphaBeta(*board, depth-1, alpha, beta, false);
+//            if (newAlpha >= alpha)
+//            {
+//                alpha = newAlpha;
+//            }
 
-            if (alpha >= beta)
-            {
-                break;
-            }
-        }
-        return alpha;
-    }
-    else if (maximizingPlayer == false)
-    {
-        foreach (Board *board, possibleBoards)
-        {
-            int newBeta = alphaBeta(board, depth-1, alpha, beta, false);
-            if (newBeta <= beta)
-            {
-                beta = newBeta;
-            }
+//            if (alpha >= beta)
+//            {
+//                break;
+//            }
+//        }
+//        return alpha;
+//    }
+//    else if (maximizingPlayer == false)
+//    {
+//        foreach (Board *board, possibleBoards)
+//        {
+//            int newBeta = alphaBeta(*board, depth-1, alpha, beta, false);
+//            if (newBeta <= beta)
+//            {
+//                beta = newBeta;
+//            }
 
-            if (alpha >= beta)
-            {
-                break;
-            }
-        }
-        return alpha;
-    }
+//            if (alpha >= beta)
+//            {
+//                break;
+//            }
+//        }
+//        return alpha;
+//    }
 
-}
+//}
 
-int AI::evaluateBoard(Board *currentBoard)
-{
-    QVector<Square*> *legalMoves;
-    currentBoard->getLegalMoves(legalMoves);
+//int AI::evaluateBoard(Board currentBoard)
+//{
+//    QVector<QPoint > legalMoves = currentBoard.getLegalMoves();
 
-    int numberOfLegalMoves = legalMoves->count();
+//    int numberOfLegalMoves = legalMoves.count();
 
-    currentBoard->countDisks();
+//    currentBoard.countDisks();
 
-}
+//}
