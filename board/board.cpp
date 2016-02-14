@@ -93,6 +93,25 @@ void Board::newBoard(int numberOfHumans)
     m_boardMatrix[4][3] = BLACK;
     m_boardMatrix[4][4] = WHITE;
 
+//    for (int x = 0; x < 3; x++)
+//    {
+//        for (int y = 0; y < BOARD_SIZE; y++)
+//        {
+//            m_boardMatrix[x][y] = WHITE;
+//        }
+
+//    }
+
+//    for (int x = 5; x < BOARD_SIZE; x++)
+//    {
+//        for (int y = 0; y < BOARD_SIZE; y++)
+//        {
+//            m_boardMatrix[x][y] = WHITE;
+//        }
+
+//    }
+
+
 
     setAllowed(getLegalMoves());
     emit signalBoardChanged();
@@ -119,23 +138,33 @@ void Board::togglePlayer()
     dummyPlayer = m_currentPlayer;
     m_currentPlayer = m_opponentPlayer;
     m_opponentPlayer = dummyPlayer;
+
+    setAllowed(getLegalMoves());
+
+    emit signalBoardChanged();
 }
 
 void Board::makePass()
 {
+
+
     if (m_currentPlayer->m_color == BLACK)
     {
         // TODO emit
-        //updateInfoText("Black passed, it's White's turn");
+        emit signalUpdateInfo(QString("Black passed, it's White's turn"));
+        qDebug() << "Black passed, it's White's turn";
     }
     else if (m_currentPlayer->m_color == WHITE)
     {
         // TODO emit
-        //updateInfoText("White passed, it's Black's turn");
+        emit signalUpdateInfo(QString("White passed, it's Black's turn"));
+        qDebug() << "White passed, it's Black's turn";
     }
     m_numberOfTotalMoves++;
+    m_numberOfActualMoves++;
     togglePlayer();
 
+    storeBoardOnStack();
 }
 
 void Board::countDisks(void)
@@ -186,7 +215,7 @@ int Board::countPlayerDisks()
 
 bool Board::legalMove(int x, int y)
 {
-    qDebug() << "--------------------------- Check new legal Move at -------------------------------";
+    //qDebug() << "--------------------------- Check new legal Move at -------------------------------";
     // check if inside board
     if(!onBoard(x, y))
     {
@@ -197,7 +226,7 @@ bool Board::legalMove(int x, int y)
     {
         return false;
     }
-    qDebug() << "Board(" << x << "," << y << ") is not occupied" << "Square State" << m_boardMatrix[x][y];
+    //qDebug() << "Board(" << x << "," << y << ") is not occupied" << "Square State" << m_boardMatrix[x][y];
     // test left for possible flips
     bool moveLegal = false;
     for(int dir = 0; dir < BOARD_SIZE; dir++)
@@ -211,15 +240,15 @@ bool Board::legalMove(int x, int y)
         {
             continue;
         }
-        qDebug() << "(tx,ty) = (" << tx << "," << ty << ") is on the board";
+        //qDebug() << "(tx,ty) = (" << tx << "," << ty << ") is on the board";
 
         // oppenent disk must be adjacent in the current direction
         if (getState(x+dx, y+dy) != getOtherPlayer(m_currentPlayer))
         {
-            qDebug() << "but there is no adjacent opponent" << getOtherPlayer(m_currentPlayer);
+            //qDebug() << "but there is no adjacent opponent" << getOtherPlayer(m_currentPlayer);
             continue;
         }
-        qDebug() << "Adjacent opponent" << getOtherPlayer(m_currentPlayer) << "found at ([x+dx],[y+dy]) = (" << x+dx << "," << y+dy << ") CurrentPlayer is" << m_currentPlayer->m_color;
+        //qDebug() << "Adjacent opponent" << getOtherPlayer(m_currentPlayer) << "found at ([x+dx],[y+dy]) = (" << x+dx << "," << y+dy << ") CurrentPlayer is" << m_currentPlayer->m_color;
 
         // as long as we stay on the board going in the current direction, we search for the surrounding disk
         while(onBoard(tx, ty) && getState(tx,ty) == getOtherPlayer(m_currentPlayer))
@@ -232,7 +261,7 @@ bool Board::legalMove(int x, int y)
         // the move is legal.
         if(onBoard(tx, ty) && getState(tx,ty) == m_currentPlayer->m_color)
         {
-            qDebug() << "Found surrounding disk of Player" << m_currentPlayer->m_color << "at (tx,ty) = (" << tx << "," << ty << ")";
+            //qDebug() << "Found surrounding disk of Player" << m_currentPlayer->m_color << "at (tx,ty) = (" << tx << "," << ty << ")";
             moveLegal = true;
             break;
         }
@@ -245,7 +274,7 @@ bool Board::legalMove(int x, int y)
 bool Board::legalMovesAvailable()
 {
     m_movesAvailable = (getLegalMoves().isEmpty() == false);
-
+    qDebug() << "legal moves available" << m_movesAvailable;
     return m_movesAvailable;
 }
 
@@ -327,7 +356,7 @@ QMap<QPair<int,int >, QVector<QPair<int,int > > > Board::getLegalMoves()
 
         }
     }
-    qDebug() << legalMoves;
+    //qDebug() << legalMoves;
     return legalMoves;
 }
 
@@ -368,7 +397,7 @@ void Board::makeMove(int x, int y)
     setAllowed(getLegalMoves());
 
 
-    qDebug() << getLegalMoves();
+    //qDebug() << getLegalMoves();
     emit signalBoardChanged();
 
     storeBoardOnStack();
@@ -406,13 +435,7 @@ bool Board::undoMove()
             }
         }
 
-
-
-        //setAllowed(getLegalMoves());
-
-        //togglePlayer();
         emit signalBoardChanged();
-
 
         m_numberOfActualMoves--;
         m_numberOfTotalMoves--;

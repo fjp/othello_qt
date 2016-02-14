@@ -137,6 +137,7 @@ private:
 
 signals:
     void signalBoardChanged();
+    void signalUpdateInfo(QString);
 
 public slots:
     /**

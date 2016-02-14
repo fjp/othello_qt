@@ -62,9 +62,20 @@ public:
 
     void makeRandomMove();
 
-    int max(int depth, int alpha, int beta);
-    int min(int depth, int alpha, int beta);
+    /**
+     * @brief max maximizing funciton of the the alpha beta pruning algorithm
+     * @param depth
+     * @param alpha
+     * @param beta
+     * @return
+     */
+    double max(int depth, double alpha, double beta);
+    double min(int depth, double alpha, double beta);
 
+    /**
+     * @brief savedMove
+     * @return
+     */
     QPair<int, int> savedMove();
 
     int m_startingDepth;
@@ -75,8 +86,11 @@ private:
 
     static const int m_heuristic[8][8];
 
-    //int alphaBeta(Board board, int depth, int alpha, int beta, bool maximizingPlayer);
-    int evaluateBoard();
+    /**
+     * @brief evaluateBoard is used to evaluate the current board using different heuristics.
+     * @return evaluation value of the current board.
+     */
+    double evaluateBoard();
 
     QPair<int, int> m_savedMove;
 

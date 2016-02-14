@@ -29,6 +29,7 @@ public slots:
     void mouseReleased(QPointF point);
     void updateUISquare(int x, int y, State currentPlayer);
     void updateUIGameScene();
+    void updateInfoTextPass(QString string);
 
 private:
     /**
@@ -47,11 +48,6 @@ private:
     void eventHandling(int x, int y);
 
     void makeComputerMove();
-
-    /**
-     * @brief togglePlayer
-     */
-    void togglePlayer();
 
     /**
      * @brief makeMove first checks if the intended move is valid using Board::legalMove(int,int,Player::Color)
@@ -120,6 +116,9 @@ private:
 
 
     AI *m_ai;
+
+
+    QString mapMoveToString(int x, int y);
 
 
 private slots:

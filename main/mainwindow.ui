@@ -111,7 +111,7 @@
         <item row="3" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>Time Limit (sec)</string>
+           <string>Search Depth</string>
           </property>
          </widget>
         </item>

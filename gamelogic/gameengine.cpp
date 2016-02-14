@@ -34,6 +34,7 @@ void GameEngine::startGame(int numberOfHumans, double timeLimit)
     updateUIGameScene();
 
     connect(m_board, SIGNAL(signalBoardChanged()), this, SLOT(updateUIGameScene()));
+    connect(m_board, SIGNAL(signalUpdateInfo(QString)), this, SLOT(updateInfoTextPass(QString)));
 
     // show infos like whos turn it is and the time needed so far (TODO is this really needed?!).
     updateInfoText("Current Player");
@@ -53,6 +54,7 @@ void GameEngine::startGame(int numberOfHumans, double timeLimit)
     if (m_numberOfHumans == 1 && m_board->whosTurnType() == COMPUTER)
     {
         makeComputerMove();
+        gameOver();
     }
 
 }
@@ -76,19 +78,26 @@ void GameEngine::updateUIGameScene()
     m_uiGameScene->redrawBoard(m_board);
 }
 
+void GameEngine::updateInfoTextPass(QString string)
+{
+    m_infoList->setText(string);
+}
+
 bool GameEngine::gameOver()
 {
     // check if current player has options to make a move
     if (m_board->legalMovesAvailable() == true)
     {
+        qDebug() << "Player" << m_board->whosTurn() << "has legal moves";
         return false;
     }
-
+    qDebug() << "Player" << m_board->whosTurn() << "NO legal moves";
     // make a pass if there are no legal moves left ...
     m_board->makePass();
     // ... and check if the opponent has legal moves left
     if(m_board->legalMovesAvailable() == true)
     {
+        qDebug() << "Player" << m_board->whosTurn() << "has legal moves";
         return false;
     }
     qDebug() << "Game Over";
@@ -147,13 +156,9 @@ void GameEngine::eventHandling(int x, int y)
             //revertAllowedUISquares(x, y);
             updateUIGameScene();
             //updateUI(x, y, Player::BLACK);
-            eventString = QString(QString::number(m_board->m_numberOfActualMoves) + ". Black played at (" +
-                                  QString::number(x) + "," + QString::number(y) +
-                                  ") in " + QString::number(getThinkingTime()) + " sec");
-
-            //togglePlayer();
-            updateInfoText("Current Player");
-            //qDebug() << "GameEngine::nextPlayer" << m_currentPlayer->m_color;
+            eventString = QString(QString::number(m_board->m_numberOfActualMoves) + ". Black played at " +
+                                  mapMoveToString(x,y) +
+                                  " in " + QString::number(getThinkingTime()) + " sec");
         }
         break;
 
@@ -164,13 +169,9 @@ void GameEngine::eventHandling(int x, int y)
             //revertAllowedUISquares(x, y);
             updateUIGameScene();
             //updateUI(x, y, Player::WHITE);
-            eventString = QString(QString::number(m_board->m_numberOfActualMoves) + ". White played at (" +
-                                  QString::number(x) + "," + QString::number(y) +
-                                  ") in " + QString::number(getThinkingTime()) + " sec");
-
-            //togglePlayer();
-            updateInfoText("Current Player");
-            //qDebug() << "GameEngine::nextPlayer" << m_currentPlayer->m_color;
+            eventString = QString(QString::number(m_board->m_numberOfActualMoves) + ". White played at " +
+                                  mapMoveToString(x,y) +
+                                  " in " + QString::number(getThinkingTime()) + " sec");
         }
         break;
 
@@ -183,33 +184,41 @@ void GameEngine::eventHandling(int x, int y)
         break;
     }
 
-
-    //bool movesAvailable = m_board->legalMovesAvailable();
-    //if (!movesAvailable)
-    //{
-        //gameOver();
-    //}
-
+    updateInfoText("Current Player");
     updateEventText(eventString);
 
     // restart the stopwatch
     m_elapsedTime = 0;
     m_thinkingTime.start();
 
-    // make a new computer move if it is his turn.
-    if (!gameOver() && m_numberOfHumans == 1 && m_board->whosTurnType() == COMPUTER)
-    {
-        makeComputerMove();
+    gameOver();
 
+    // make a new computer move if it is his turn.
+    while (!m_gameOver && m_numberOfHumans == 1 && m_board->whosTurn() == COMPUTER
+           && m_board->legalMovesAvailable() == true)
+    {
+        if (m_board->legalMovesAvailable() == true)
+        {
+            makeComputerMove();
+        }
+        else
+        {
+            gameOver();
+        }
+
+    }
+
+    if (m_board->legalMovesAvailable() == false)
+    {
+        if (!m_gameOver && m_board->legalMovesAvailable() == true && m_board->whosTurnType() == COMPUTER)
+        {
+            makeComputerMove();
+        }
     }
 }
 
 void GameEngine::makeComputerMove()
 {
-    //m_ai->makeRandomMove();
-
-    gameOver();
-
     m_ai->m_startingDepth = m_timeLimit;
 
     QPair<int,int> savedMove = QPair<int,int>(-10,-10);
@@ -226,34 +235,33 @@ void GameEngine::makeComputerMove()
     else
     {
         // execute saved moves
-        qDebug() << "executing saved moves";
-        if (m_board->legalMove(savedMove.first, savedMove.second))
+        qDebug() << "executing saved moves (" << savedMove.first << "," << savedMove.second << ") for player " << m_board->whosTurn();
+        if (!m_gameOver && m_board->legalMove(savedMove.first, savedMove.second))
         {
             m_board->makeMove(savedMove.first, savedMove.second);
         }
         else
         {
-            qDebug() << "COMPUTER MADE A WRONG MOVE!";
+            qDebug() << "COMPUTER MADE A WRONG MOVE! (" << savedMove.first << "," << savedMove.second << ")";
         }
     }
 
-    updateInfoText("Current Player");
-
-    bool movesAvailable = m_board->legalMovesAvailable();
-    if (!movesAvailable)
-    {
-        gameOver();
-    }
-
-    QString eventString = QString(QString::number(m_board->m_numberOfActualMoves) + ". Computer played at (" +
-                          QString::number(savedMove.first) + "," + QString::number(savedMove.second) +
-                          ") in " + QString::number(getThinkingTime()) + " sec");
+    QString eventString = QString(QString::number(m_board->m_numberOfActualMoves) + ". Computer played at " +
+                          mapMoveToString(savedMove.first,savedMove.second) +
+                          " in " + QString::number(getThinkingTime()) + " sec");
     updateInfoText("Current Player");
     updateEventText(eventString);
 
     // restart the stopwatch
     m_elapsedTime = 0;
     m_thinkingTime.start();
+
+    if (m_board->legalMovesAvailable() == false && m_board->whosTurnType() == HUMAN)
+    {
+        gameOver();
+        if (m_gameOver == false)
+            makeComputerMove();
+    }
 }
 
 void GameEngine::updateUISquare(int x, int y, State currentPlayer)
@@ -315,14 +323,43 @@ double GameEngine::getThinkingTime()
     return m_elapsedTime;
 }
 
-void GameEngine::togglePlayer()
+QString GameEngine::mapMoveToString(int x, int y)
 {
+    QString moveString;
+    y = y + 1;
+    switch (x)
+    {
+    case 0:
+        moveString = QString("A") + QString::number(y);
+        break;
+    case 1:
+        moveString = QString("B") + QString::number(y);
+        break;
+    case 2:
+        moveString = QString("C") + QString::number(y);
+        break;
 
-    // TODO comment or delet; just for debugging
-    m_board->countDisks();
+    case 3:
+        moveString = QString("D") + QString::number(y);
+        break;
 
-    Player *dummyPlayer;
-    dummyPlayer = m_currentPlayer;
-    m_currentPlayer = m_opponentPlayer;
-    m_opponentPlayer = dummyPlayer;
+    case 4:
+        moveString = QString("E") + QString::number(y);
+        break;
+    case 5:
+        moveString = QString("F") + QString::number(y);
+        break;
+
+    case 6:
+        moveString = QString("G") + QString::number(y);
+        break;
+
+    case 7:
+        moveString = QString("H") + QString::number(y);
+        break;
+    }
+
+    moveString = QString("(") + moveString + QString(")");
+
+    return moveString;
 }
