@@ -7,6 +7,11 @@
 
 #include "define.h"
 
+/**
+ * @brief The UISquare class represents a single square inside the QGraphicsScene (UIGameScene).
+ * It is used to show the different states of a square (BOARD, BLACK, WHITE, ALLOWED) to the user.
+ * The board matrix 2x2 QVector of the UIGameScene class consists of these UISquares.
+ */
 class UISquare : public QObject, public QGraphicsItem
 {
     Q_OBJECT
@@ -29,16 +34,12 @@ public:
     /**
      * @brief setState update the state of the square according to passed
      * enum State {NONE, BOARD, BLACK, WHITE, ALLOWED, SUGGESTED}
-     *
      * @param state
      */
     void setUISquareState(const State state);
     State getUISquareState() const;
     void setPosition(const double boardPositionX, const double boardPositionY);
     void setSize(const double size);
-
-public slots:
-
 
 private:
     void initSquare();

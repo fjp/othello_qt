@@ -23,8 +23,6 @@ void GameEngine::startGame(int numberOfHumans, double timeLimit)
 
     m_timeLimit = timeLimit;
 
-    // TODO use these variables...
-    m_numberOfTotalMoves = 0;
     m_elapsedTime = 0;
 
     m_gameOver = false;
@@ -68,7 +66,6 @@ void GameEngine::mouseReleased(QPointF point)
     }
     int x = point.x() / m_uiGameScene->m_sizeSceneRect * BOARD_SIZE;
     int y = point.y() / m_uiGameScene->m_sizeSceneRect * BOARD_SIZE;
-    // TODO comment all qDebug()s
     //qDebug() << "Mouse pointer is at" << point << "x" << x << "y" << y;
     eventHandling(x, y);
 }

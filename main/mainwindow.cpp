@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->textEditInfo->setWordWrapMode(QTextOption::WordWrap);
 
     // check if time input is double!!!!!
-    ui->lineEditTimeLimit->setValidator(new QDoubleValidator(0, 100, 2, this));
+    ui->lineEditTimeLimit->setValidator(new QIntValidator(0, 10, this));
 
     connect(ui->pushButtonNewGame, SIGNAL(released()), this, SLOT(startNewGame()));
 

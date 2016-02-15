@@ -13,6 +13,11 @@
 #include "board/board.h"
 #include "define.h"
 
+/**
+ * @brief The UIGameScene class stores the graphical representation of the board using
+ * UISquare class. The GameEngine uses this class to redraw the board matrix from the Board class.
+ * This class also forwards mouse release events to the GameEngine made by the user.
+ */
 class UIGameScene : public QGraphicsScene
 {
     Q_OBJECT
@@ -24,10 +29,29 @@ public:
     UIGameScene(QObject * parent);
     ~UIGameScene();
 
+    /**
+     * @brief setSquareState
+     * @param x column of the board.
+     * @param y row of the board.
+     * @param state new state of the square at position (x,y).
+     */
     void setSquareState(int x, int y, State state);
+
+    /**
+     * @brief redrawBoard redraws every single square with the current state of the
+     * board matrix from the passed Board class instance.
+     * @param board Board class that holds the current board matrix with its states.
+     */
     void redrawBoard(Board *board);
 
+    /**
+     * @brief m_sizeSceneRect size (width and height) of the whole board.
+     */
     double m_sizeSceneRect;
+
+    /**
+     * @brief m_squareSize size (width and height) of a single square.
+     */
     double m_squareSize;
 
 signals:
@@ -61,7 +85,7 @@ private:
     //void generatePlayers();
 
     /**
-     * @brief m_board is a 2x2 matrix which used to store pointers UISquares.
+     * @brief m_board is a 2x2 matrix which used to store pointers to UISquares.
      * Initialization is done using drawBoard() and the State of the signel UISquares
      * are updated using the public setSquareState() function.
      */

@@ -2,13 +2,6 @@
 #define AI_H
 
 /*
-Search:
-As almost all game playing programs, our Othello player uses a minimax search with alpha-beta pruning.
-It also uses some move ordering in order to help pruning more quickly.
-The move ordering is very primitive,
-and it simply tests first the placed around the disc which the opponent has just played,
-since there is a somewhat larger probability that those places will be more favorable.
-
 Evaluation Function:
 We have implemented two evaluation functions used during two different stages of the game.
 A heuristic evaluation function is used during the beginning and mid-game when the board
@@ -54,6 +47,12 @@ and thus one corner square is worth 10 legal moves or 1000 discs.
 #include "player/player.h"
 #include "define.h"
 
+/**
+ * @brief The AI class implements the alpha-beta pruning algorithm to find
+ * the next move for the computer player. Thereby three different heuristics
+ * (disc count, legal moves count, square rating), implemented in
+ * the evaluation funciton, are used.
+ */
 class AI
 {
 
@@ -63,40 +62,61 @@ public:
     void makeRandomMove();
 
     /**
-     * @brief max maximizing funciton of the the alpha beta pruning algorithm
-     * @param depth
-     * @param alpha
-     * @param beta
-     * @return
+     * @brief max maximizing funciton for the black player of the the alpha-beta pruning algorithm.
+     * @param depth user defined search depth in the beginning of the recursion.
+     * @param alpha maximum score that the maximizing player (black) is assured of.
+     * @param beta minimum score that the minimizing player (white) is assured of.
+     * @return value of the evaluation function at depth zero or at a terminal node
+     * (board where current player has no more moves availabel).
      */
     double max(int depth, double alpha, double beta);
+    /**
+     * @brief min minimizing function for the white player of the alpha-beta pruning algorithm.
+     * @param depth depth user defined search depth in the beginning of the recursion.
+     * @param alpha alpha maximum score that the maximizing player (black) is assured of.
+     * @param beta beta minimum score that the minimizing player (white) is assured of.
+     * @return value of the evaluation function at depth zero or at a terminal node
+     * (board where current player has no more moves availabel).
+     */
     double min(int depth, double alpha, double beta);
 
     /**
-     * @brief savedMove
+     * @brief savedMove is used to get the best move, found by the alpha-beta pruning algorithm,
+     * inside the GameEngine class.
      * @return
      */
     QPair<int, int> savedMove();
 
+    /**
+     * @brief m_startingDepth maximum search depth defined by the user.
+     */
     int m_startingDepth;
 
 
 private:
+    /**
+     * @brief m_board pointer to the currently used board.
+     */
     Board *m_board;
 
+    /**
+     * @brief m_heuristic 2x2 matrix of the board that assigns weightings to the single board positions.
+     * corners are rated higher than edges and X corners, which are considered "bad", have negative values.
+     */
     static const int m_heuristic[8][8];
 
     /**
      * @brief evaluateBoard is used to evaluate the current board using different heuristics.
+     * Three different heuristics are used: disc count, number of legal moves, and rating of board positions
+     * by using the m_heuristic matrix.
      * @return evaluation value of the current board.
      */
     double evaluateBoard();
 
+    /**
+     * @brief m_savedMove stores the best found move by the alpha-beta pruning algorithm.
+     */
     QPair<int, int> m_savedMove;
-
-
-
-    //Board m_currentBoard;
 };
 
 #endif // AI_H
